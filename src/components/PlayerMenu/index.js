@@ -35,6 +35,7 @@ export default class PlayerMenu extends Component {
         metadata.name
       )}?a=${auth}&id=${id}`
     );
+
     if (isAndroid) {
       const scheme = streamURL.protocol.slice(0, -1);
       streamURL.hash = `Intent;action=android.intent.action.VIEW;scheme=${scheme};type=${
@@ -43,14 +44,23 @@ export default class PlayerMenu extends Component {
       streamURL.protocol = "intent";
       mobileUrl = streamURL.toString();
     } else if (isIOS) {
-      streamURL.host = "x-callback-url";
-      streamURL.port = "";
-      streamURL.pathname = "stream";
-      streamURL.search = `url=${server}/api/v1/redirectdownload/${encodeURIComponent(
-        metadata.name
-      )}?a=${auth}&id=${id}`;
-      streamURL.protocol = "vlc-x-callback";
-      mobileUrl = streamURL.toString();
+      // Realizar una solicitud HTTP a la URL generada para obtener la redirección
+      fetch(streamURL)
+        .then(response => response.url)
+        .then(redirectedUrl => {
+          const adjustedUrl = new URL(redirectedUrl);
+          adjustedUrl.host = "x-callback-url";
+          adjustedUrl.port = "";
+          adjustedUrl.pathname = "stream";
+          adjustedUrl.search = `url=${server}/api/v1/redirectdownload/${encodeURIComponent(
+            metadata.name
+          )}?a=${auth}&id=${id}`;
+          adjustedUrl.protocol = "vlc-x-callback";
+          mobileUrl = adjustedUrl.toString();
+        })
+        .catch(error => {
+          console.error('Error al realizar la solicitud:', error);
+        });
     }
 
     return (
