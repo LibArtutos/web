@@ -76,35 +76,31 @@ export default class PlayerMenu extends Component {
           onClose={this.handleClose}
         >
          <MenuItem
-              onClick={async () => {
-                try {
-                  // Realizar una solicitud HTTP a la URL generada
-                  const response = await fetch(
-                      `${server}/api/v1/redirectdownload/${encodeURIComponent(
-                          metadata.name
-                      )}?a=${auth}&id=${id}`
-                  );
+  onClick={async () => {
+    try {
+      // Construir la URL de redirección
+      const redirectUrl = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
 
-                  // Verificar si la solicitud fue exitosa
-                  if (response.ok) {
-                    // Obtener la URL de redirección de la respuesta
-                    const redirectedUrl = response.url;
+      // Crear un Intent
+      const intentUri = `intent://#Intent;action=android.intent.action.VIEW;scheme=http;type=${metadata.mimeType};package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(redirectUrl)};end`;
 
-                    // Copiar la URL de redirección al portapapeles
-                    navigator.clipboard.writeText(redirectedUrl);
+      // Realizar una solicitud HTTP a la URL generada
+      const response = await fetch(redirectUrl);
 
-                    // Cerrar la ventana emergente o menú
-                    this.handleClose();
-                  } else {
-                    console.error('La solicitud no fue exitosa');
-                  }
-                } catch (error) {
-                  console.error('Error al realizar la solicitud:', error);
-                }
-              }}
-          >
-            Reproductor
-          </MenuItem>
+      // Verificar si la solicitud fue exitosa
+      if (response.ok) {
+        // Intentar abrir la URL en un navegador web específico (en este caso, Chrome)
+        window.location.href = intentUri;
+      } else {
+        console.error('La solicitud no fue exitosa');
+      }
+    } catch (error) {
+      console.error('Error al realizar la solicitud o abrir la URL:', error);
+    }
+  }}
+>
+  Reproductor
+</MenuItem>
 
 
                 
