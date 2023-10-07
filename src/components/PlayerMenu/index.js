@@ -75,27 +75,39 @@ export default class PlayerMenu extends Component {
           open={Boolean(this.state.menuAnchor)}
           onClose={this.handleClose}
         >
-          {isAndroid || isIOS ? (
-            <div>
-              <a href={mobileUrl} className="no_decoration_link">
-                <MenuItem onClick={this.handleClose}>
-                  {isAndroid ? "Android" : isIOS ? "IOS selector" : null}
-                </MenuItem>
-              </a>
-              <Divider />
-            </div>
-          ) : (
-            <div>
-              <a
-                href={`potplayer://${server}/api/v1/redirectdownload/${encodeURIComponent(
-                  metadata.name
-                )}?a=${auth}&id=${id}`}
-                className="no_decoration_link"
-              >
-                <MenuItem onClick={this.handleClose}>PotPlayer</MenuItem>
-              </a>
-            </div>
-          )}
+         <MenuItem
+              onClick={async () => {
+                try {
+                  // Realizar una solicitud HTTP a la URL generada
+                  const response = await fetch(
+                      `${server}/api/v1/redirectdownload/${encodeURIComponent(
+                          metadata.name
+                      )}?a=${auth}&id=${id}`
+                  );
+
+                  // Verificar si la solicitud fue exitosa
+                  if (response.ok) {
+                    // Obtener la URL de redirección de la respuesta
+                    const redirectedUrl = response.url;
+
+                    // Copiar la URL de redirección al portapapeles
+                    navigator.clipboard.writeText(redirectedUrl);
+
+                    // Cerrar la ventana emergente o menú
+                    this.handleClose();
+                  } else {
+                    console.error('La solicitud no fue exitosa');
+                  }
+                } catch (error) {
+                  console.error('Error al realizar la solicitud:', error);
+                }
+              }}
+          >
+            Reproductor
+          </MenuItem>
+
+
+                
           <Divider />
           <MenuItem
               onClick={async () => {
@@ -125,7 +137,7 @@ export default class PlayerMenu extends Component {
                 }
               }}
           >
-            Copy URL
+            Copiar URL
           </MenuItem>
         </Menu>
       </div>
