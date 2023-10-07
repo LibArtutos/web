@@ -59,7 +59,7 @@ export default class DownloadMenu extends Component {
           onClick={this.handleClick}
           startIcon={<CloudDownloadOutlinedIcon />}
         >
-          Download
+          Descargar
         </Button>
         <Menu
           id="download-menu"
