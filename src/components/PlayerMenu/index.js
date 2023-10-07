@@ -99,7 +99,7 @@ export default class PlayerMenu extends Component {
     }
   }}
 >
-  Reproductor
+  Reproductor Externo
 </MenuItem>
 
 
