@@ -78,19 +78,25 @@ export default class PlayerMenu extends Component {
          <MenuItem
   onClick={async () => {
     try {
-      // Construir la URL de redirección
-      const redirectUrl = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
+      // Construir la URL de redirección inicial
+      const initialRedirectUrl = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
 
-      // Crear un Intent
-      const intentUri = `intent://#Intent;action=android.intent.action.VIEW;scheme=http;type=${metadata.mimeType};end`;
+      // Realizar una solicitud HTTP para obtener la URL final
+      const response = await fetch(initialRedirectUrl);
 
-      // Realizar una solicitud HTTP a la URL generada
-      const response = await fetch(redirectUrl);
-
-      // Verificar si la solicitud fue exitosa
       if (response.ok) {
-        // Intentar abrir la URL en un navegador web específico (en este caso, Chrome)
-        window.location.href = intentUri;
+        // Obtener la URL final desde la cabecera de respuesta (puede variar según la API)
+        const finalRedirectUrl = response.headers.get('final-redirect-url');
+
+        if (finalRedirectUrl) {
+          // Crear un Intent URI genérico para que el usuario elija la aplicación
+          const intentUri = `intent://#Intent;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.android;end`;
+
+          // Intentar abrir la URL final en cualquier aplicación compatible
+          window.location.href = intentUri + `;S.url=${finalRedirectUrl}`;
+        } else {
+          console.error('No se pudo obtener la URL final de redirección.');
+        }
       } else {
         console.error('La solicitud no fue exitosa');
       }
@@ -101,6 +107,7 @@ export default class PlayerMenu extends Component {
 >
   Reproductor Externo
 </MenuItem>
+
 
 
                 
