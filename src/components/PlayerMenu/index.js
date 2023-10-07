@@ -29,39 +29,40 @@ export default class PlayerMenu extends Component {
   render() {
     let { auth, id, isAndroid, isIOS, metadata, server } = this.state;
 
-    let mobileUrl;
-    const streamURL = new URL(
-      `${server}/api/v1/redirectdownload/${encodeURIComponent(
-        metadata.name
-      )}?a=${auth}&id=${id}`
-    );
+  let mobileUrl;
+const redirectURL = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
 
-    if (isAndroid) {
-      const scheme = streamURL.protocol.slice(0, -1);
-      streamURL.hash = `Intent;action=android.intent.action.VIEW;scheme=${scheme};type=${
-        metadata.mimeType
-      };S.title=${encodeURIComponent(metadata.name)};end`;
-      streamURL.protocol = "intent";
-      mobileUrl = streamURL.toString();
-    } else if (isIOS) {
-      // Realizar una solicitud HTTP a la URL generada para obtener la redirección
-      fetch(streamURL)
-        .then(response => response.url)
-        .then(redirectedUrl => {
-          const adjustedUrl = new URL(redirectedUrl);
-          adjustedUrl.host = "x-callback-url";
-          adjustedUrl.port = "";
-          adjustedUrl.pathname = "stream";
-          adjustedUrl.search = `url=${server}/api/v1/redirectdownload/${encodeURIComponent(
-            metadata.name
-          )}?a=${auth}&id=${id}`;
-          adjustedUrl.protocol = "vlc-x-callback";
-          mobileUrl = adjustedUrl.toString();
-        })
-        .catch(error => {
-          console.error('Error al realizar la solicitud:', error);
-        });
+// Hacer la solicitud HTTP
+fetch(redirectURL)
+  .then(response => {
+    if (response.ok) {
+      return response.text(); // Puedes usar response.json() si esperas una respuesta JSON
+    } else {
+      throw new Error('Error en la solicitud HTTP');
     }
+  })
+  .then(data => {
+    // Actualizar streamURL con la URL obtenida de la respuesta HTTP
+    const newURL = new URL(data);
+    
+    if (isAndroid) {
+      const scheme = newURL.protocol.slice(0, -1);
+      newURL.hash = `Intent;action=android.intent.action.VIEW;scheme=${scheme};type=${metadata.mimeType};S.title=${encodeURIComponent(metadata.name)};end`;
+      newURL.protocol = "intent";
+    } else if (isIOS) {
+      newURL.host = "x-callback-url";
+      newURL.port = "";
+      newURL.pathname = "stream";
+      newURL.search = `url=${redirectURL}`;
+      newURL.protocol = "vlc-x-callback";
+    }
+    
+    streamURL = newURL.toString();
+    mobileUrl = streamURL;
+  })
+  .catch(error => {
+    console.error('Error al hacer la solicitud HTTP:', error);
+  });
 
     return (
       <div className="info__button">
