@@ -125,7 +125,7 @@ export default class PlayerMenu extends Component {
                 }
               }}
           >
-            Copy URL
+            Copiar URL
           </MenuItem>
         </Menu>
       </div>
