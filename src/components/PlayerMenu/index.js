@@ -82,7 +82,7 @@ export default class PlayerMenu extends Component {
       const redirectUrl = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
 
       // Crear un Intent
-      const intentUri = `intent://#Intent;action=android.intent.action.VIEW;scheme=http;type=${metadata.mimeType};package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(redirectUrl)};end`;
+      const intentUri = `intent://#Intent;action=android.intent.action.VIEW;scheme=http;type=${metadata.mimeType};end`;
 
       // Realizar una solicitud HTTP a la URL generada
       const response = await fetch(redirectUrl);
