@@ -75,6 +75,7 @@ export default class PlayerMenu extends Component {
           open={Boolean(this.state.menuAnchor)}
           onClose={this.handleClose}
         >
+/*
          <MenuItem
   onClick={async () => {
     try {
@@ -110,7 +111,8 @@ export default class PlayerMenu extends Component {
 
 
                 
-          <Divider />
+          <Divider /> 
+        */
           <MenuItem
               onClick={async () => {
                 try {
