@@ -75,27 +75,25 @@ export default class PlayerMenu extends Component {
           open={Boolean(this.state.menuAnchor)}
           onClose={this.handleClose}
         >
-          {isAndroid || isIOS ? (
-            <div>
-              <a href={mobileUrl} className="no_decoration_link">
-                <MenuItem onClick={this.handleClose}>
-                  {isAndroid ? "Reproductor Externo" : isIOS ? "IOS selector" : null}
-                </MenuItem>
-              </a>
-              <Divider />
-            </div>
-          ) : (
-            <div>
-              <a
-                href={`potplayer://${server}/api/v1/redirectdownload/${encodeURIComponent(
-                  metadata.name
-                )}?a=${auth}&id=${id}`}
-                className="no_decoration_link"
-              >
-                <MenuItem onClick={this.handleClose}>PotPlayer</MenuItem>
-              </a>
-            </div>
-          )}
+          <MenuItem
+  onClick={async () => {
+    try {
+      // Construir la URL de redirección
+      const redirectUrl = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
+
+      // Crear un Intent
+      const intentUri = `intent://#Intent;action=android.intent.action.VIEW;scheme=http;type=${metadata.mimeType};end`;
+
+      // Intentar abrir la URL en un navegador web y permitir al usuario seleccionar la aplicación
+      window.location.href = intentUri;
+    } catch (error) {
+      console.error('Error al abrir la URL:', error);
+    }
+  }}
+>
+  Reproductor
+</MenuItem>
+
           <Divider />
           <MenuItem
             onClick={() => {
