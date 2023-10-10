@@ -76,36 +76,42 @@ export default class PlayerMenu extends Component {
           onClose={this.handleClose}
         >
 
-          <MenuItem
-              onClick={async () => {
-                try {
-                  // Realizar una solicitud HTTP a la URL generada
-                  const response = await fetch(
-                      `${server}/api/v1/redirectdownload/${encodeURIComponent(
-                          metadata.name
-                      )}?a=${auth}&id=${id}`
-                  );
+<MenuItem
+  onClick={async () => {
+    try {
+      const customUserAgent = "Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Mobile Safari/537.36";
+      
+      // Realizar una solicitud HTTP a la URL generada con el User-Agent personalizado
+      const response = await fetch(
+        `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`,
+        {
+          headers: {
+            'User-Agent': customUserAgent
+          }
+        }
+      );
 
-                  // Verificar si la solicitud fue exitosa
-                  if (response.ok) {
-                    // Obtener la URL de redirección de la respuesta
-                    const redirectedUrl = response.url;
+      // Verificar si la solicitud fue exitosa
+      if (response.ok) {
+        // Obtener la URL de redirección de la respuesta
+        const redirectedUrl = response.url;
 
-                    // Copiar la URL de redirección al portapapeles
-                    navigator.clipboard.writeText(redirectedUrl);
+        // Copiar la URL de redirección al portapapeles
+        navigator.clipboard.writeText(redirectedUrl);
 
-                    // Cerrar la ventana emergente o menú
-                    this.handleClose();
-                  } else {
-                    console.error('La solicitud no fue exitosa');
-                  }
-                } catch (error) {
-                  console.error('Error al realizar la solicitud:', error);
-                }
-              }}
-          >
-            Copiar URL
-          </MenuItem>
+        // Cerrar la ventana emergente o menú
+        this.handleClose();
+      } else {
+        console.error('La solicitud no fue exitosa');
+      }
+    } catch (error) {
+      console.error('Error al realizar la solicitud:', error);
+    }
+  }}
+>
+  Copiar URL
+</MenuItem>
+
         </Menu>
       </div>
     );
