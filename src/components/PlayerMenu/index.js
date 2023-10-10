@@ -81,18 +81,26 @@ export default class PlayerMenu extends Component {
       // Construir la URL de redirección
       const redirectUrl = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
 
-      // Crear un Intent para abrir la URL en Chrome
-      const chromeIntentUri = `intent://#Intent;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(redirectUrl)};end`;
+      // Crear un Intent con la acción VIEW
+      const intent = new Intent();
+      intent.setAction("android.intent.action.VIEW");
 
-      // Intentar abrir la URL en Chrome
-      window.location.href = chromeIntentUri;
+      // Establecer la URL en el Intent
+      intent.setData(Uri.parse(redirectUrl));
+
+      // Solicitar al sistema que abra el selector de aplicaciones
+      intent.addCategory("android.intent.category.BROWSABLE");
+
+      // Iniciar el Intent
+      window.Android.startActivity(intent);
     } catch (error) {
-      console.error('Error al abrir la URL en Chrome:', error);
+      console.error('Error al abrir la URL:', error);
     }
   }}
 >
   Reproductor Externo
 </MenuItem>
+
 
 
 
