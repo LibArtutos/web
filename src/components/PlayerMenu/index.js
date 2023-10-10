@@ -75,66 +75,40 @@ export default class PlayerMenu extends Component {
           open={Boolean(this.state.menuAnchor)}
           onClose={this.handleClose}
         >
-            <MenuItem
-  onClick={async () => {
-    try {
-      // Construir la URL de redirección inicial
-      const initialRedirectUrl = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
-
-      // Crear un Intent URI para que el usuario elija la aplicación
-      const intentUri = `intent://#Intent;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.android;S.browser_fallback_url=${initialRedirectUrl};end`;
-
-      // Intentar abrir la URL inicial y mostrar la lista de aplicaciones genéricas
-      window.location.href = intentUri;
-    } catch (error) {
-      console.error('Error al intentar abrir la URL:', error);
-    }
-  }}
->
-  Reproductor Externo
-</MenuItem>
-
-
-
-                
+          {isAndroid || isIOS ? (
+            <div>
+              <a href={mobileUrl} className="no_decoration_link">
+                <MenuItem onClick={this.handleClose}>
+                  {isAndroid ? "Reproductor Externo" : isIOS ? "IOS selector" : null}
+                </MenuItem>
+              </a>
+              <Divider />
+            </div>
+          ) : (
+            <div>
+              <a
+                href={`potplayer://${server}/api/v1/redirectdownload/${encodeURIComponent(
+                  metadata.name
+                )}?a=${auth}&id=${id}`}
+                className="no_decoration_link"
+              >
+                <MenuItem onClick={this.handleClose}>PotPlayer</MenuItem>
+              </a>
+            </div>
+          )}
           <Divider />
-
-<MenuItem
-  onClick={async () => {
-    try {
-      const customUserAgent = "Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Mobile Safari/537.36";
-      
-      // Realizar una solicitud HTTP a la URL generada con el User-Agent personalizado
-      const response = await fetch(
-        `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`,
-        {
-          headers: {
-            'User-Agent': customUserAgent
-          }
-        }
-      );
-
-      // Verificar si la solicitud fue exitosa
-      if (response.ok) {
-        // Obtener la URL de redirección de la respuesta
-        const redirectedUrl = response.url;
-
-        // Copiar la URL de redirección al portapapeles
-        navigator.clipboard.writeText(redirectedUrl);
-
-        // Cerrar la ventana emergente o menú
-        this.handleClose();
-      } else {
-        console.error('La solicitud no fue exitosa');
-      }
-    } catch (error) {
-      console.error('Error al realizar la solicitud:', error);
-    }
-  }}
->
-  Copiar URL
-</MenuItem>
-
+          <MenuItem
+            onClick={() => {
+              navigator.clipboard.writeText(
+                `${server}/api/v1/redirectdownload/${encodeURIComponent(
+                  metadata.name
+                )}?a=${auth}&id=${id}`
+              );
+              this.handleClose();
+            }}
+          >
+            Copiar URL
+          </MenuItem>
         </Menu>
       </div>
     );
