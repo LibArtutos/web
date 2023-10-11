@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import { Linking } from 'react-native';
+
 
 import { Button, Divider, Menu, MenuItem } from "@material-ui/core";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
