@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 
-import SendIntentAndroid from 'react-native-send-intent';
-
 
 import { Button, Divider, Menu, MenuItem } from "@material-ui/core";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
