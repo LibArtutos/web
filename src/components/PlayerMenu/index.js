@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 
-import { Linking } from 'react-native';
-
 
 import { Button, Divider, Menu, MenuItem } from "@material-ui/core";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
@@ -56,17 +54,19 @@ export default class PlayerMenu extends Component {
           open={Boolean(this.state.menuAnchor)}
           onClose={this.handleClose}
         >
-          <MenuItem
+
+
+            <MenuItem
   onClick={() => {
     try {
       // Construir la URL de redirección
       const redirectUrl = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
-      
-      // Intentar abrir la URL en una aplicación de reproductor de video externo
-      Linking.openURL(redirectUrl)
-        .catch((err) => {
-          console.error('Error al abrir la URL en el reproductor de video:', err);
-        });
+
+      // Crear un Intent genérico con la acción VIEW y el esquema http
+      const intentUri = `intent://#Intent;action=android.intent.action.VIEW;S.scheme=http;S.type=${metadata.mimeType};end`;
+
+      // Intentar abrir la URL y permitir que el usuario elija la aplicación
+      window.location.href = intentUri;
     } catch (error) {
       console.error('Error al abrir la URL:', error);
     }
@@ -74,6 +74,7 @@ export default class PlayerMenu extends Component {
 >
   Reproductor Externo
 </MenuItem>
+
 
 
 
