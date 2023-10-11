@@ -75,27 +75,16 @@ export default class PlayerMenu extends Component {
           open={Boolean(this.state.menuAnchor)}
           onClose={this.handleClose}
         >
+            
           <MenuItem>
   <a
-    href={() => {
-      try {
-        // Construir la URL de redirección
-        const redirectUrl = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
-
-        // Crear un Intent con la acción VIEW y la URL
-        const intentUri = `intent:#Intent;action=android.intent.action.VIEW;S.url=${redirectUrl};end`;
-
-        // Establecer la propiedad href del enlace con el intentUri
-        return intentUri;
-      } catch (error) {
-        console.error('Error al abrir la URL:', error);
-        // Puedes regresar a una URL de error o realizar alguna otra acción en caso de error.
-      }
-    }}
+    href={`intent:#Intent;action=android.intent.action.VIEW;S.scheme=${scheme};S.type=${metadata.mimeType};S.title=${encodeURIComponent(metadata.name)};S.url=${encodeURIComponent(redirectUrl)};end`}
   >
     Reproductor
   </a>
 </MenuItem>
+
+      
           <Divider />
           <MenuItem
             onClick={() => {
