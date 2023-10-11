@@ -73,27 +73,16 @@ export default class PlayerMenu extends Component {
           open={Boolean(this.state.menuAnchor)}
           onClose={this.handleClose}
         >
-          {isAndroid || isIOS ? (
-            <div>
-              <a href={mobileUrl} className="no_decoration_link">
-                <MenuItem onClick={this.handleClose}>
-                  {isAndroid ? "Reproductor Externo" : isIOS ? "IOS selector" : null}
-                </MenuItem>
-              </a>
-              <Divider />
-            </div>
-          ) : (
-            <div>
-              <a
-                href={`potplayer://${server}/api/v1/redirectdownload/${encodeURIComponent(
-                  metadata.name
-                )}?a=${auth}&id=${id}`}
-                className="no_decoration_link"
-              >
-                <MenuItem onClick={this.handleClose}>PotPlayer</MenuItem>
-              </a>
-            </div>
-          )}
+
+          <MenuItem>
+  <a
+    href={`intent://#Intent;action=android.intent.action.VIEW;package=com.android.browser;S.browser_fallback_url=${server}/api/v1/redirectdownload/${metadataName}?a=${auth}&id=${id};end`}
+    target="_blank"
+  >
+    Repro Externo
+  </a>
+</MenuItem>
+          
           <Divider />
           <MenuItem
             onClick={() => {
