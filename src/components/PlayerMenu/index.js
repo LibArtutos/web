@@ -59,11 +59,14 @@ export default class PlayerMenu extends Component {
     try {
       // Construir la URL de redirección
       const redirectUrl = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
-
-      // Crear un intent personalizado y abrirlo
-      SendIntentAndroid.openURL(redirectUrl);
+      
+      // Intentar abrir la URL en una aplicación de reproductor de video externo
+      Linking.openURL(redirectUrl)
+        .catch((err) => {
+          console.error('Error al abrir la URL en el reproductor de video:', err);
+        });
     } catch (error) {
-      console.error('Error al abrir el Intent:', error);
+      console.error('Error al abrir la URL:', error);
     }
   }}
 >
