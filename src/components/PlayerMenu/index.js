@@ -37,9 +37,7 @@ export default class PlayerMenu extends Component {
     );
     if (isAndroid) {
       const scheme = streamURL.protocol.slice(0, -1);
-      streamURL.hash = `Intent;action=android.intent.action.VIEW;scheme=${scheme};type=${
-        metadata.mimeType
-      };S.title=${encodeURIComponent(metadata.name)};end`;
+      streamURL.hash = `Intent;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;scheme=${scheme};type=${metadata.mimeType};package=;component=;S.title=${encodeURIComponent(metadata.name)};end`;
       streamURL.protocol = "intent";
       mobileUrl = streamURL.toString();
     } else if (isIOS) {
