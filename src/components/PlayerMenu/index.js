@@ -37,7 +37,9 @@ export default class PlayerMenu extends Component {
     );
     if (isAndroid) {
       const scheme = streamURL.protocol.slice(0, -1);
-      streamURL.hash = `Intent;action=android.intent.action.VIEW;package=org.videolan.vlc;S.scheme=http;S.type=video/*;S.title=${encodeURIComponent(metadata.name)};end`;
+      streamURL.hash = `Intent;action=android.intent.action.VIEW;scheme=${scheme};type=${
+        metadata.mimeType
+      };S.title=${encodeURIComponent(metadata.name)};end`;
       streamURL.protocol = "intent";
       mobileUrl = streamURL.toString();
     } else if (isIOS) {
@@ -73,16 +75,27 @@ export default class PlayerMenu extends Component {
           open={Boolean(this.state.menuAnchor)}
           onClose={this.handleClose}
         >
-
-          <MenuItem>
-  <a
-    href={`intent://#Intent;action=android.intent.action.VIEW;package=com.android.browser;S.browser_fallback_url=${server}/api/v1/redirectdownload/${metadataName}?a=${auth}&id=${id};end`}
-    target="_blank"
-  >
-    Repro Externo
-  </a>
-</MenuItem>
-          
+          {isAndroid || isIOS ? (
+            <div>
+              <a href={mobileUrl} className="no_decoration_link">
+                <MenuItem onClick={this.handleClose}>
+                  {isAndroid ? "Reproductor Externo" : isIOS ? "IOS selector" : null}
+                </MenuItem>
+              </a>
+              <Divider />
+            </div>
+          ) : (
+            <div>
+              <a
+                href={`potplayer://${server}/api/v1/redirectdownload/${encodeURIComponent(
+                  metadata.name
+                )}?a=${auth}&id=${id}`}
+                className="no_decoration_link"
+              >
+                <MenuItem onClick={this.handleClose}>PotPlayer</MenuItem>
+              </a>
+            </div>
+          )}
           <Divider />
           <MenuItem
             onClick={() => {
