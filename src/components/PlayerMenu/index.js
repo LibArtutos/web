@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 
-
 import { Button, Divider, Menu, MenuItem } from "@material-ui/core";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 
@@ -30,7 +29,29 @@ export default class PlayerMenu extends Component {
   render() {
     let { auth, id, isAndroid, isIOS, metadata, server } = this.state;
 
-    
+    let mobileUrl;
+    const streamURL = new URL(
+      `${server}/api/v1/redirectdownload/${encodeURIComponent(
+        metadata.name
+      )}?a=${auth}&id=${id}`
+    );
+    if (isAndroid) {
+      const scheme = streamURL.protocol.slice(0, -1);
+      streamURL.hash = `Intent;action=android.intent.action.VIEW;scheme=${scheme};type=${
+        metadata.mimeType
+      };S.title=${encodeURIComponent(metadata.name)};end`;
+      streamURL.protocol = "intent";
+      mobileUrl = streamURL.toString();
+    } else if (isIOS) {
+      streamURL.host = "x-callback-url";
+      streamURL.port = "";
+      streamURL.pathname = "stream";
+      streamURL.search = `url=${server}/api/v1/redirectdownload/${encodeURIComponent(
+        metadata.name
+      )}?a=${auth}&id=${id}`;
+      streamURL.protocol = "vlc-x-callback";
+      mobileUrl = streamURL.toString();
+    }
 
     return (
       <div className="info__button">
@@ -54,31 +75,27 @@ export default class PlayerMenu extends Component {
           open={Boolean(this.state.menuAnchor)}
           onClose={this.handleClose}
         >
+          <MenuItem>
+  <a
+    href={() => {
+      try {
+        // Construir la URL de redirección
+        const redirectUrl = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
 
+        // Crear un Intent con la acción VIEW y la URL
+        const intentUri = `intent:#Intent;action=android.intent.action.VIEW;S.url=${redirectUrl};end`;
 
-            <MenuItem
-  onClick={() => {
-    try {
-      // Construir la URL de redirección
-      const redirectUrl = `${server}/api/v1/redirectdownload/${encodeURIComponent(metadata.name)}?a=${auth}&id=${id}`;
-
-      // Crear un Intent con la acción VIEW
-      const intentUri = `intent:#Intent;action=android.intent.action.VIEW;S.url=${redirectUrl};end`;
-
-      // Intentar abrir la URL en un navegador web específico (por ejemplo, Chrome)
-      window.location.href = intentUri;
-    } catch (error) {
-      console.error('Error al abrir la URL:', error);
-    }
-  }}
->
-  Reproductor
+        // Establecer la propiedad href del enlace con el intentUri
+        return intentUri;
+      } catch (error) {
+        console.error('Error al abrir la URL:', error);
+        // Puedes regresar a una URL de error o realizar alguna otra acción en caso de error.
+      }
+    }}
+  >
+    Reproductor
+  </a>
 </MenuItem>
-
-
-
-
-
           <Divider />
           <MenuItem
             onClick={() => {
