@@ -1,7 +1,7 @@
 {
   "name": "libdrive-web",
   "version": "1.4.7",
-  "description": "libDrive is a Google Drive media library manager and indexer, similar to Plex, that organizes Google Drive media to offer an intuitive and user-friendly experience.",
+  "description": "GBStream es la mejor plataforma para ver películas y series español latino, full hd, la mejor calidad, los mejores servidores",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -14,7 +14,7 @@
     "@sweetalert2/theme-dark": "^5.0.8",
     "array-move": "^4.0.0",
     "axios": "^0.24.0",
-    "libdrive-player": "git+https://github.com/LibArtutos/player.git#v0.4.3",
+    "libdrive-player": "git+https://github.com/libDrive/player.git#v0.4.3",
     "react-router-dom": "^5.2.0",
     "react-smooth-dnd": "^0.11.1",
     "srt-webvtt": "^2.0.0",
@@ -30,7 +30,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/libDrive/web.git"
+    "url": "git+https://github.com/libArtutos/web.git"
   },
   "author": "Elias Benbourenane <me@elias.eu.org> (https://elias.eu.org)",
   "funding": [

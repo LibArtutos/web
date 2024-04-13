@@ -1,17 +1,11 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
-import {
-  Divider,
-  FormControl,
-  Select,
-  InputLabel,
-  MenuItem,
-} from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
+import {Divider, FormControl, InputLabel, MenuItem, Select,} from "@material-ui/core";
+import {withStyles} from "@material-ui/core/styles";
 
-import { guid } from "../../components";
+import {guid} from "../../components";
 
 import "./index.css";
 

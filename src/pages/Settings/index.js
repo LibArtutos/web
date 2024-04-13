@@ -1,14 +1,14 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Button, CircularProgress, Switch, TextField } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
+import {Button, CircularProgress, Switch, TextField} from "@material-ui/core";
+import {withStyles} from "@material-ui/core/styles";
 
 import Swal from "sweetalert2/src/sweetalert2.js";
 import "@sweetalert2/theme-dark/dark.css";
 
 import axios from "axios";
 
-import { Footer, Nav, theme } from "../../components";
+import {Footer, Nav, theme} from "../../components";
 
 const styles = (theme) => ({
   Form: {

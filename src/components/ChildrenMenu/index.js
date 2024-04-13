@@ -1,11 +1,11 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
-import { Button, Menu, MenuItem } from "@material-ui/core";
+import {Button, Menu, MenuItem} from "@material-ui/core";
 import TvIcon from "@material-ui/icons/Tv";
 
-import { guid } from "../../components";
+import {guid} from "../../components";
 
 export default class ChildrenMenu extends Component {
   constructor(props) {
@@ -43,7 +43,7 @@ export default class ChildrenMenu extends Component {
           onClick={this.handleClick}
           startIcon={<TvIcon />}
         >
-          Seasons
+          Temporadas
         </Button>
         <Menu
           id="children-menu"

@@ -1,15 +1,8 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  IconButton,
-  Tooltip,
-  Typography,
-} from "@material-ui/core";
+import {Button, Dialog, DialogTitle, IconButton, Tooltip, Typography,} from "@material-ui/core";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -19,8 +12,8 @@ import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
 import SaveAltIcon from "@material-ui/icons/SaveAlt";
 import StarIcon from "@material-ui/icons/Star";
 
-import { Container, Draggable } from "react-smooth-dnd";
-import { arrayMoveImmutable } from "array-move";
+import {Container, Draggable} from "react-smooth-dnd";
+import {arrayMoveImmutable} from "array-move";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
@@ -31,7 +24,7 @@ import DragHandleIcon from "@material-ui/icons/DragHandle";
 import Swal from "sweetalert2/src/sweetalert2.js";
 import "@sweetalert2/theme-dark/dark.css";
 
-import { guid, theme } from "../../components";
+import {guid, theme} from "../../components";
 import "./index.css";
 
 export default class Carousel extends Component {

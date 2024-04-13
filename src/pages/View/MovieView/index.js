@@ -1,42 +1,34 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
 import {
-  Avatar,
-  Button,
-  Chip,
-  ClickAwayListener,
-  Divider,
-  IconButton,
-  Menu,
-  MenuItem,
-  Tooltip,
-  Typography,
+    Avatar,
+    Button,
+    Chip,
+    ClickAwayListener,
+    Divider,
+    IconButton,
+    Menu,
+    MenuItem,
+    Tooltip,
+    Typography,
 } from "@material-ui/core";
-import { Rating } from "@material-ui/lab";
+import {Rating} from "@material-ui/lab";
 import StarIcon from "@material-ui/icons/Star";
 import StarBorderIcon from "@material-ui/icons/StarBorder";
 import SubtitlesOutlinedIcon from "@material-ui/icons/SubtitlesOutlined";
 import YouTubeIcon from "@material-ui/icons/YouTube";
 
 import DPlayer from "libdrive-player";
-import { default as toWebVTT } from "srt-webvtt";
+import {default as toWebVTT} from "srt-webvtt";
 
 import Swal from "sweetalert2/src/sweetalert2.js";
 import "@sweetalert2/theme-dark/dark.css";
 
 import axios from "axios";
 
-import {
-  DownloadMenu,
-  guid,
-  PlayerMenu,
-  seo,
-  StarDialog,
-  theme,
-  TrailerDialog,
-} from "../../../components";
+import {DownloadMenu, guid, PlayerMenu, seo, StarDialog, theme, TrailerDialog,} from "../../../components";
 
 export default class MovieView extends Component {
   constructor(props) {
@@ -60,13 +52,14 @@ export default class MovieView extends Component {
 
   componentDidMount() {
     let { metadata, ui_config } = this.state;
+    let year = new Date().getFullYear();
 
     seo({
-      title: `${ui_config.title || "libDrive"} - ${
-        metadata.title || metadata.name
-      }`,
+      title: `${ui_config.title || "GBStream"} - ${
+          metadata.title || metadata.name
+      } (${year}) - Español Latino Gratis`,
       description: `Watch ${metadata.title || metadata.name} on ${
-        ui_config.title || "libDrive"
+          ui_config.title || "GBStream"
       }! — ${metadata.overview}`,
       image: metadata.backdropPath,
       type: "video.movie",
@@ -255,7 +248,7 @@ export default class MovieView extends Component {
               theme: theme.palette.primary.main,
               contextmenu: [
                 {
-                  text: "libDrive",
+                  text: "GBStream",
                   link: "https://github.com/libDrive/libDrive",
                 },
               ],

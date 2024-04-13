@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Carousel, Footer, Nav } from "../../components";
+import {Carousel, Footer, Nav} from "../../components";
 
 export default class StarredLists extends Component {
   constructor(props) {

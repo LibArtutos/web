@@ -1,14 +1,7 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import {
-  Avatar,
-  Button,
-  Container,
-  CssBaseline,
-  TextField,
-  Typography,
-} from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
+import {Avatar, Button, Container, CssBaseline, TextField, Typography,} from "@material-ui/core";
+import {withStyles} from "@material-ui/core/styles";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
 import Swal from "sweetalert2/src/sweetalert2.js";
@@ -16,7 +9,7 @@ import "@sweetalert2/theme-dark/dark.css";
 
 import axios from "axios";
 
-import { theme } from "../../components";
+import {theme} from "../../components";
 import Footer from "../../components/Footer";
 
 const styles = (theme) => ({

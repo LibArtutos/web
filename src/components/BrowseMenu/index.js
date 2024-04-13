@@ -1,10 +1,10 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
-import { Button, Divider, Menu, MenuItem } from "@material-ui/core";
+import {Button, Divider, Menu, MenuItem} from "@material-ui/core";
 
-import { guid } from "../../components";
+import {guid} from "../../components";
 
 export default class BrowseMenu extends Component {
   constructor(props) {

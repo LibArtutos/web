@@ -1,4 +1,4 @@
-import { createTheme } from "@material-ui/core/styles";
+import {createTheme} from "@material-ui/core/styles";
 
 const lightTheme = createTheme({
   palette: {
@@ -50,8 +50,8 @@ const darkTheme = createTheme({
       main: "#4caf50",
     },
     background: {
-      default: "#181a1b",
-      paper: "#151617",
+      default: "#000000",
+      paper: "#000000",
     },
     text: {
       primary: "#e8e6e3",

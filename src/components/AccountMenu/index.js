@@ -1,8 +1,8 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
-import { Divider, IconButton, Menu, MenuItem } from "@material-ui/core";
+import {Divider, IconButton, Menu, MenuItem} from "@material-ui/core";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 
 import "@sweetalert2/theme-dark/dark.css";

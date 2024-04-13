@@ -1,22 +1,22 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
 import {
-  Avatar,
-  Button,
-  Chip,
-  ClickAwayListener,
-  Dialog,
-  DialogTitle,
-  Divider,
-  IconButton,
-  Menu,
-  MenuItem,
-  Tooltip,
-  Typography,
+    Avatar,
+    Button,
+    Chip,
+    ClickAwayListener,
+    Dialog,
+    DialogTitle,
+    Divider,
+    IconButton,
+    Menu,
+    MenuItem,
+    Tooltip,
+    Typography,
 } from "@material-ui/core";
-import { Rating } from "@material-ui/lab";
+import {Rating} from "@material-ui/lab";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import StarIcon from "@material-ui/icons/Star";
@@ -25,7 +25,7 @@ import SubtitlesOutlinedIcon from "@material-ui/icons/SubtitlesOutlined";
 import YouTubeIcon from "@material-ui/icons/YouTube";
 
 import DPlayer from "libdrive-player";
-import { default as toWebVTT } from "srt-webvtt";
+import {default as toWebVTT} from "srt-webvtt";
 
 import Swal from "sweetalert2/src/sweetalert2.js";
 import "@sweetalert2/theme-dark/dark.css";
@@ -33,15 +33,15 @@ import "@sweetalert2/theme-dark/dark.css";
 import axios from "axios";
 
 import {
-  ChildrenMenu,
-  DownloadMenu,
-  guid,
-  PlayerMenu,
-  PlaylistMenu,
-  seo,
-  StarDialog,
-  theme,
-  TrailerDialog,
+    ChildrenMenu,
+    DownloadMenu,
+    guid,
+    PlayerMenu,
+    PlaylistMenu,
+    seo,
+    StarDialog,
+    theme,
+    TrailerDialog,
 } from "../../../components";
 
 export class TVBView extends Component {
@@ -62,13 +62,14 @@ export class TVBView extends Component {
 
   componentDidMount() {
     let { metadata, ui_config } = this.state;
+    let year = new Date().getFullYear();
 
     seo({
-      title: `${ui_config.title || "libDrive"} - ${
-        metadata.title || metadata.name
-      }`,
+      title: `${ui_config.title || "GBStream"} - ${
+          metadata.title || metadata.name
+      } (${year}) - Español Latino Gratis`,
       description: `Watch ${metadata.title || metadata.name} on ${
-        ui_config.title || "libDrive"
+          ui_config.title || "GBStream"
       }! — ${metadata.overview}`,
       image: metadata.backdropPath,
       type: "video.movie",
@@ -337,9 +338,9 @@ export class TVSView extends Component {
     let { metadata, q, ui_config } = this.state;
 
     seo({
-      title: `${ui_config.title || "libDrive"} - ${metadata.children[q].name}`,
+      title: `${ui_config.title || "GBStream"} - ${metadata.children[q].name}`,
       description: `Watch ${metadata.children[q].name} on ${
-        ui_config.title || "libDrive"
+        ui_config.title || "GBStream"
       }!`,
       type: "video.episode",
     });
@@ -477,7 +478,7 @@ export class TVSView extends Component {
               theme: theme.palette.primary.main,
               contextmenu: [
                 {
-                  text: "libDrive",
+                  text: "GBStream",
                   link: "https://github.com/libDrive/libDrive",
                 },
               ],

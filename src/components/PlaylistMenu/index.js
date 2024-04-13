@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Button } from "@material-ui/core";
+import {Button} from "@material-ui/core";
 import PlaylistPlayRoundedIcon from "@material-ui/icons/PlaylistPlayRounded";
 
 export default class PlaylistMenu extends Component {

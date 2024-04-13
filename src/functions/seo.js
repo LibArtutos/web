@@ -4,10 +4,10 @@ export default function seo(data = {}) {
       window.sessionStorage.getItem("ui_config") ||
       "{}"
   );
-  data.title = data.title || ui_config.title || "libDrive";
+  data.title = data.title || ui_config.title || "GBStream";
   data.description =
     data.description ||
-    "libDrive is a Google Drive media library manager and indexer, similar to Plex, that organizes Google Drive media to offer an intuitive and user-friendly experience.";
+    "GBStream es la mejor plataforma para ver películas y series español latino, full hd, la mejor calidad, los mejores servidores";
   data.image = data.image || ui_config.icon || "/images/icons/icon-512x512.png";
   data.type = data.type || "website";
   document.title = data.title || ui_config.title;

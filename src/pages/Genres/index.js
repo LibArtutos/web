@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { CircularProgress } from "@material-ui/core";
+import {CircularProgress} from "@material-ui/core";
 
 import Swal from "sweetalert2/src/sweetalert2.js";
 import "@sweetalert2/theme-dark/dark.css";
@@ -8,15 +8,7 @@ import "@sweetalert2/theme-dark/dark.css";
 import axios from "axios";
 import queryString from "query-string";
 
-import {
-  Footer,
-  Nav,
-  PageMenu,
-  SortMenu,
-  seo,
-  theme,
-  Tile,
-} from "../../components";
+import {Footer, Nav, PageMenu, seo, SortMenu, theme, Tile,} from "../../components";
 
 export default class CategoryBrowse extends Component {
   constructor(props) {
@@ -146,9 +138,9 @@ export default class CategoryBrowse extends Component {
 
     if (isLoaded) {
       seo({
-        title: `${ui_config.title || "libDrive"}${genre ? ` - ${genre}` : ""}`,
+        title: `${ui_config.title || "GBStream"}${genre ? ` - ${genre}` : ""}`,
         description: `Browse ${genre ? `the ${genre} genre` : "genres"} on ${
-          ui_config.title || "libDrive"
+          ui_config.title || "GBStream"
         }!`,
       });
     }

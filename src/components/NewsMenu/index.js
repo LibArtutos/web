@@ -1,19 +1,11 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import {
-  Badge,
-  Divider,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Menu,
-} from "@material-ui/core";
+import {Badge, Divider, IconButton, List, ListItem, ListItemText, Menu,} from "@material-ui/core";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 
 import axios from "axios";
 
-import { guid, theme, version } from "../../components";
+import {guid, theme, version} from "../../components";
 
 export default class NewsMenu extends Component {
   constructor(props) {

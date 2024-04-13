@@ -1,8 +1,6 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { withStyles } from "@material-ui/core/styles";
-
-import { version } from "../../components";
+import {withStyles} from "@material-ui/core/styles";
 
 const styles = (theme) => ({
   footer__container: {
@@ -19,25 +17,13 @@ class Footer extends Component {
     const { classes } = this.props;
 
     return (
-      <div style={{ paddingTop: "75px" }}>
-        <footer className={classes.footer__container} id="footer__container">
-          <a href="https://github.com/libDrive/libDrive/" target="_blank">
-            <img
-              src="/images/github.gif"
-              className="footer__github"
-              height="64px"
-              alt="github-logo"
-            />
-          </a>
-          <a
-            className="no_decoration_link footer__text"
-            href="https://elias.eu.org"
-            target="_blank"
-          >
-            {`© 2021 Copyright: Elias Benbourenane - v${version}`}
-          </a>
-        </footer>
-      </div>
+        <div style={{ paddingTop: "75px" }}>
+          <footer className={classes.footer__container} id="footer__container">
+          <span className="footer__text">
+            © 2024 Copyright: GBStream
+          </span>
+          </footer>
+        </div>
     );
   }
 }

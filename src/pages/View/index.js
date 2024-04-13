@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { CircularProgress } from "@material-ui/core";
+import {CircularProgress} from "@material-ui/core";
 
 import Swal from "sweetalert2/src/sweetalert2.js";
 import "@sweetalert2/theme-dark/dark.css";
@@ -8,9 +8,9 @@ import "@sweetalert2/theme-dark/dark.css";
 import axios from "axios";
 import queryString from "query-string";
 
-import { Footer, guid, Nav, seo, theme } from "../../components";
+import {Footer, guid, Nav, seo, theme} from "../../components";
 import MovieView from "./MovieView";
-import { TVBView, TVSView } from "./TVView";
+import {TVBView, TVSView} from "./TVView";
 import "./index.css";
 
 export default class View extends Component {
@@ -332,10 +332,10 @@ export default class View extends Component {
     if (isLoaded) {
       seo({
         title: metadata.title
-          ? `${ui_config.title || "libDrive"} - ${metadata.title}`
-          : ui_config.title || "libDrive",
+          ? `${ui_config.title || "GBStream"} - ${metadata.title}`
+          : ui_config.title || "GBStream",
         description: `Watch ${metadata.title || metadata.name} on ${
-          ui_config.title || "libDrive"
+          ui_config.title || "GBStream"
         }!`,
         image: metadata.backdropPath,
       });

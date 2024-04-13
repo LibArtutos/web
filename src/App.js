@@ -1,8 +1,8 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Redirect } from "react-router-dom";
+import {Redirect} from "react-router-dom";
 
-import { clear, guid, version } from "./components";
+import {clear, guid, version} from "./components";
 
 export default class App extends Component {
   constructor(props) {

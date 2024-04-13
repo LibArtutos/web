@@ -1,10 +1,10 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
-import { Typography } from "@material-ui/core";
+import {Typography} from "@material-ui/core";
 
-import { guid } from "../../components";
+import {guid} from "../../components";
 import "./index.css";
 
 export default class Tile extends Component {

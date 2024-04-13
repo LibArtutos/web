@@ -1,13 +1,13 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { CircularProgress } from "@material-ui/core";
+import {CircularProgress} from "@material-ui/core";
 
 import Swal from "sweetalert2/src/sweetalert2.js";
 import "@sweetalert2/theme-dark/dark.css";
 
 import axios from "axios";
 
-import { Carousel, Footer, Nav, seo, theme } from "../../components";
+import {Carousel, Footer, Nav, seo, theme} from "../../components";
 
 export default class Search extends Component {
   constructor(props) {
@@ -40,8 +40,8 @@ export default class Search extends Component {
     }
 
     seo({
-      title: `${ui_config.title || "libDrive"} - ${query}`,
-      description: `Find ${query} on ${ui_config.title || "libDrive"}!`,
+      title: `${ui_config.title || "GBStream"} - ${query}`,
+      description: `Find ${query} on ${ui_config.title || "GBStream"}!`,
     });
 
     let req_path = `${server}/api/v1/metadata`;

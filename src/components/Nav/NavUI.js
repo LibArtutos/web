@@ -1,26 +1,12 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
-import {
-  AppBar,
-  Avatar,
-  IconButton,
-  InputBase,
-  Toolbar,
-  Typography,
-} from "@material-ui/core";
-import { alpha } from "@material-ui/core/styles";
+import {AppBar, Avatar, IconButton, InputBase, Toolbar, Typography,} from "@material-ui/core";
+import {alpha, withStyles} from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
-import { withStyles } from "@material-ui/core/styles";
 
-import {
-  AccountMenu,
-  BrowseMenu,
-  NewsMenu,
-  ThemeMenu,
-  guid,
-} from "../../components";
+import {AccountMenu, BrowseMenu, guid, ThemeMenu,} from "../../components";
 
 const styles = (theme) => ({
   root: {
@@ -126,7 +112,7 @@ class NavUI extends Component {
                 </Avatar>
               ) : (
                 <Typography className={classes.title} variant="h6" noWrap>
-                  {ui_config.title || "libDrive"}
+                  {ui_config.title || "GBStream"}
                 </Typography>
               )}
             </Link>
@@ -153,7 +139,6 @@ class NavUI extends Component {
             <div className={classes.grow} />
             <BrowseMenu categories={categories} />
             <ThemeMenu ui_config={ui_config} />
-            {!ui_config.hide_news ? <NewsMenu /> : null}
             <AccountMenu accounts={accounts} ui_config={ui_config} />
           </Toolbar>
         </AppBar>

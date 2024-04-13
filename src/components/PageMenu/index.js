@@ -1,11 +1,11 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Link, Redirect } from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 
-import { Pagination, PaginationItem } from "@material-ui/lab";
-import { withStyles } from "@material-ui/core/styles";
+import {Pagination, PaginationItem} from "@material-ui/lab";
+import {withStyles} from "@material-ui/core/styles";
 
-import { guid } from "../../components";
+import {guid} from "../../components";
 
 const styles = (theme) => ({
   root: {

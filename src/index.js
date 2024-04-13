@@ -1,15 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import {BrowserRouter, Route, Switch} from "react-router-dom";
 
-import { CssBaseline } from "@material-ui/core";
-import { ThemeProvider } from "@material-ui/core/styles";
+import {CssBaseline} from "@material-ui/core";
+import {ThemeProvider} from "@material-ui/core/styles";
 
 import {
   App,
   Browse,
   CategoryBrowse,
   Genres,
+  guid,
   Login,
   Logout,
   NotFound,
@@ -18,7 +19,6 @@ import {
   SettingsLoginForm,
   StarredLists,
   theme,
-  guid,
   View,
 } from "./components";
 import "./index.css";

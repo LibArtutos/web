@@ -30,7 +30,7 @@ import ThemeMenu_ from "./components/ThemeMenu";
 import Tile_ from "./components/Tile";
 import TrailerDialog_ from "./components/TrailerDialog";
 import uuid_ from "./functions/uuid";
-import { version } from "../package.json";
+import {version} from "../package.json";
 import View_ from "./pages/View";
 
 export { AccountMenu_ as AccountMenu };

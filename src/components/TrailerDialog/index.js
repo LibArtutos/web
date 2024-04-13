@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Dialog, DialogTitle } from "@material-ui/core";
+import React, {Component} from "react";
+import {Dialog, DialogTitle} from "@material-ui/core";
 
 export default class StarDialog extends Component {
   constructor(props) {

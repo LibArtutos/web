@@ -1,10 +1,10 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Redirect } from "react-router-dom";
+import {Redirect} from "react-router-dom";
 
-import { CircularProgress } from "@material-ui/core";
+import {CircularProgress} from "@material-ui/core";
 
-import { guid } from "../../components";
+import {guid} from "../../components";
 
 export default class Logout extends Component {
   constructor(props) {

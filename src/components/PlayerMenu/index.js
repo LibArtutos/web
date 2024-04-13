@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Button, Divider, Menu, MenuItem } from "@material-ui/core";
+import {Button, Divider, Menu, MenuItem} from "@material-ui/core";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 
 export default class PlayerMenu extends Component {

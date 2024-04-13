@@ -1,21 +1,21 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import {
-  Avatar,
-  Button,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Dialog,
-  DialogTitle,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  TextField,
+    Avatar,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    List,
+    ListItem,
+    ListItemAvatar,
+    ListItemText,
+    TextField,
 } from "@material-ui/core";
 import ListIcon from "@material-ui/icons/List";
 import AddIcon from "@material-ui/icons/Add";
-import { theme } from "../../components";
+import {theme} from "../../components";
 
 export default class StarDialog extends Component {
   constructor(props) {

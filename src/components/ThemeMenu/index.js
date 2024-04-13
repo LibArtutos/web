@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
-import { Divider, IconButton, Menu, MenuItem } from "@material-ui/core";
+import {Divider, IconButton, Menu, MenuItem} from "@material-ui/core";
 import Brightness6Icon from "@material-ui/icons/Brightness6";
 
 export default class ThemeMenu extends Component {
