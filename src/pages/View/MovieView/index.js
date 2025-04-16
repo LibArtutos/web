@@ -151,10 +151,10 @@ export default class MovieView extends Component {
     }
   }
   
-  // Método mejorado para manejar errores en el iframe con detección específica de 404
+  // Método mejorado para manejar errores en el iframe - simplificado y más directo
   handleIframeError() {
     console.log("[Debug] Error en el iframe detectado por evento onError");
-    // El evento onError es bastante confiable, así que cambiamos directamente
+    // Cambiar inmediatamente al reproductor por defecto
     this.setState({ 
       iframeError: true,
       currentPlayer: "default" 
@@ -383,82 +383,61 @@ export default class MovieView extends Component {
                   borderStyle: "solid",
                 }}
                 onError={this.handleIframeError}
-                onLoad={(e) => {
-                  // Esperamos un poco para verificar los errores 404 después de que se "cargue" el iframe
+                onLoad={() => {
+                  // Método simplificado: verificar directamente en la consola si hubo error 404
+                  let foundError = false;
+                  
+                  // Esperamos un momento para que los mensajes de error se registren en la consola
                   setTimeout(() => {
-                    // Verificación definitiva para errores 404 - busca directamente en la consola
-                    const errors = window.performance.getEntries()
-                      .filter(entry => {
-                        return entry.name.includes(`Smoothpre.com/embed/${this.state.alternativeId}`);
-                      });
+                    // Verificación simplificada: si hay un 404 en la consola, cambiamos al player por defecto
+                    const errorPattern = /Failed to load resource.*404/i;
                     
-                    if (errors.length === 0) {
-                      // Si no encontramos la entrada del recurso principal, probablemente falló
-                      console.log("[Debug] No se encontró el recurso del iframe en las entradas de rendimiento");
-                      this.setState({ iframeError: true, currentPlayer: "default" });
-                      return;
-                    }
+                    // Verificamos si la URL del iframe es válida intentando hacer un fetch
+                    fetch(`https://Smoothpre.com/embed/${this.state.alternativeId}`, { 
+                      method: 'HEAD',
+                      mode: 'no-cors' // Esto evita errores CORS pero no nos da info sobre status
+                    })
+                    .catch(() => {
+                      // Si hay un error con el fetch, probablemente la URL no es válida
+                      console.log("[Debug] Error al verificar URL del iframe, cambiando a player por defecto");
+                      if (!this.state.iframeError) {
+                        this.setState({ iframeError: true, currentPlayer: "default" });
+                      }
+                    });
                     
-                    // Verificamos si hay un 404 específicamente para nuestra URL
-                    const has404 = document.querySelector('iframe').contentDocument === null;
-                    
-                    if (has404) {
-                      console.log("[Debug] Detectado error 404 - contentDocument es null");
-                      this.setState({ iframeError: true, currentPlayer: "default" });
+                    // Verificar el estado del iframe después de cargar
+                    const iframe = document.querySelector('iframe');
+                    if (!iframe || !iframe.contentWindow) {
+                      foundError = true;
                     } else {
                       try {
-                        // Última verificación: intentar acceder al contenido para ver si es válido
-                        const frameContent = document.querySelector('iframe').contentWindow;
-                        if (!frameContent || frameContent.document.body.innerHTML === '') {
-                          console.log("[Debug] Frame cargado pero contenido vacío o inaccesible");
-                          this.setState({ iframeError: true, currentPlayer: "default" });
-                        } else {
-                          console.log("[Debug] El iframe ha cargado correctamente con contenido válido");
+                        // Si no podemos acceder al documento del iframe, probablemente sea un error de origen cruzado o 404
+                        const doc = iframe.contentWindow.document;
+                        if (!doc || doc.body.innerHTML.trim() === '') {
+                          foundError = true;
                         }
-                      } catch(err) {
-                        // Si hay un error de seguridad por CORS, también cambiamos al reproductor por defecto
-                        console.log("[Debug] Error de seguridad al acceder al iframe:", err);
-                        // Los errores de seguridad generalmente indican que el iframe cargó pero desde otro origen
-                        // En este caso, esperamos un segundo más y verificamos si ha habido algún error 404
-                        setTimeout(() => {
-                          const consoleMessages = window.performance.getEntries()
-                            .filter(entry => entry.name.includes('404'));
-                          
-                          if (consoleMessages.length > 0) {
-                            console.log("[Debug] Detectado error 404 en consola después de cargar iframe");
-                            this.setState({ iframeError: true, currentPlayer: "default" });
-                          }
-                          
-                          // Último recurso: crear un simple detector de errores 404
-                          const createErrorDetector = () => {
-                            if (window.iframeError404Detector) return;
-                            
-                            window.iframeError404Detector = true;
-                            const originalFetch = window.fetch;
-                            window.fetch = function(...args) {
-                              return originalFetch.apply(this, args)
-                                .then(response => {
-                                  if (response.status === 404 && args[0].includes('Smoothpre.com')) {
-                                    console.log("[Debug] Interceptado error 404 en fetch:", args[0]);
-                                    document.dispatchEvent(new CustomEvent('iframe404', { detail: args[0] }));
-                                  }
-                                  return response;
-                                });
-                            };
-                            
-                            document.addEventListener('iframe404', () => {
-                              console.log("[Debug] Evento 404 detectado, cambiando reproductor");
-                              if (this && !this.state.iframeError) {
-                                this.setState({ iframeError: true, currentPlayer: "default" });
-                              }
-                            });
-                          };
-                          
-                          createErrorDetector();
-                        }, 1500);
+                      } catch (err) {
+                        // Error de seguridad al intentar acceder - necesitamos verificar de otra manera
+                        console.log("[Debug] No se puede acceder al contenido del iframe, verificando elementos de red");
+                        
+                        // Verificar directamente en los registros del performance API
+                        const entries = performance.getEntriesByType('resource')
+                          .filter(entry => entry.name.includes('Smoothpre.com/embed'));
+                        
+                        // Si no encontramos entradas o hay alguna entrada con error, asumimos que falló
+                        if (entries.length === 0) {
+                          foundError = true;
+                          console.log("[Debug] No hay recursos del iframe registrados");
+                        }
                       }
                     }
-                  }, 2000);
+                    
+                    // Si detectamos un error, cambiamos al reproductor por defecto
+                    if (foundError && !this.state.iframeError) {
+                      console.log("[Debug] Se detectó un problema con el iframe, cambiando a reproductor por defecto");
+                      this.setState({ iframeError: true, currentPlayer: "default" });
+                    }
+                  }, 1000);
                 }}
               ></iframe>
             )}
