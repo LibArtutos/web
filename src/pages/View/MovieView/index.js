@@ -71,6 +71,7 @@ export default class MovieView extends Component {
     
     // Nuevo método para manejar el cambio de reproductor
     this.handlePlayerChange = this.handlePlayerChange.bind(this);
+    this.fetchAlternativeId = this.fetchAlternativeId.bind(this);
   }
 
   componentDidMount() {
@@ -92,24 +93,44 @@ export default class MovieView extends Component {
     this.fetchAlternativeId();
   }
   
-  // Nuevo método para obtener el ID alternativo
+  // Nuevo método para obtener el ID alternativo con más depuración
   async fetchAlternativeId() {
     try {
       // Usar directamente el ID que ya obtuvimos en el constructor
       const originalId = this.state.directUrlId;
       
-      console.log("ID obtenido de la URL:", originalId);
+      console.log("[Debug] ID obtenido de la URL:", originalId);
       
       // Llamar al servicio para obtener el ID alternativo
       const response = await axios.get(`https://id-earn.artutos-data.workers.dev/${originalId}`);
       
+      // Depurar la respuesta completa
+      console.log("[Debug] Respuesta completa:", response);
+      console.log("[Debug] Data recibida:", response.data);
+      
+      // Determinar el ID alternativo correctamente según la estructura
+      let altId;
+      if (typeof response.data === 'object' && response.data.id) {
+        altId = response.data.id;
+        console.log("[Debug] ID obtenido del objeto response.data.id:", altId);
+      } else if (typeof response.data === 'string') {
+        altId = response.data;
+        console.log("[Debug] ID obtenido directamente como string:", altId);
+      } else {
+        console.error("[Debug] No se pudo determinar el ID alternativo:", response.data);
+        altId = null;
+      }
+      
+      console.log("[Debug] ID alternativo final a usar:", altId);
+      
       // Almacenar el ID alternativo
       this.setState({
-        alternativeId: response.data.id || response.data,
+        alternativeId: altId,
         isLoadingAltId: false
       });
     } catch (error) {
-      console.error("Error obteniendo ID alternativo:", error);
+      console.error("[Debug] Error obteniendo ID alternativo:", error);
+      // En caso de error, dejar el estado isLoadingAltId en false
       this.setState({ isLoadingAltId: false });
     }
   }
@@ -117,6 +138,12 @@ export default class MovieView extends Component {
   // Método para cambiar entre reproductores
   handlePlayerChange(playerType) {
     this.setState({ currentPlayer: playerType });
+    
+    // Si cambiamos al reproductor alternativo y no tenemos ID, intentamos obtenerlo
+    if (playerType === "alternative" && !this.state.alternativeId) {
+      this.setState({ isLoadingAltId: true });
+      this.fetchAlternativeId();
+    }
   }
 
   async onFileChange(evt) {
@@ -274,16 +301,12 @@ export default class MovieView extends Component {
       // Nuevos estados
       currentPlayer,
       alternativeId,
-      directUrlId,
       isLoadingAltId
     } = this.state;
 
     if (file) {
       tracks = [{ name: fileName, url: file }];
     }
-
-    // ID a usar para el iframe (preferimos el alternativo si está disponible)
-    const iframeId = alternativeId || directUrlId;
 
     return (
       <div className="MovieView">
@@ -325,27 +348,8 @@ export default class MovieView extends Component {
         {currentPlayer === "alternative" ? (
           // Reproductor alternativo (iframe)
           <div className="plyr__component" style={{ position: "relative", width: "100%", height: 0, paddingBottom: "56.25%" }}>
-            {iframeId ? (
-              <iframe 
-                src={`https://Smoothpre.com/embed/${iframeId}`}
-                frameBorder="0"
-                marginWidth="0" 
-                marginHeight="0" 
-                scrolling="no" 
-                allowFullScreen
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "12px",
-                  borderWidth: "5px",
-                  borderColor: "black",
-                  borderStyle: "solid",
-                }}
-              ></iframe>
-            ) : (
+            {isLoadingAltId ? (
+              // Mostrar indicador de carga mientras obtenemos el ID alternativo
               <div style={{
                 position: "absolute",
                 top: 0,
@@ -365,6 +369,60 @@ export default class MovieView extends Component {
                 <div style={{ textAlign: "center" }}>
                   <CircularProgress size={40} style={{ marginBottom: "10px" }}/>
                   <Typography variant="subtitle1">Cargando reproductor...</Typography>
+                </div>
+              </div>
+            ) : alternativeId ? (
+              // Solo mostrar el iframe si tenemos un ID alternativo
+              <iframe 
+                src={`https://Smoothpre.com/embed/${alternativeId}`}
+                frameBorder="0"
+                marginWidth="0" 
+                marginHeight="0" 
+                scrolling="no" 
+                allowFullScreen
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "12px",
+                  borderWidth: "5px",
+                  borderColor: "black",
+                  borderStyle: "solid",
+                }}
+              ></iframe>
+            ) : (
+              // Mensaje cuando no se pudo obtener el ID alternativo
+              <div style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "#000",
+                color: "#fff",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: "12px",
+                borderWidth: "5px",
+                borderColor: "black",
+                borderStyle: "solid",
+              }}>
+                <div style={{ textAlign: "center" }}>
+                  <Typography variant="subtitle1">Error al cargar el reproductor alternativo</Typography>
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    style={{ marginTop: "10px" }}
+                    onClick={() => {
+                      this.setState({ isLoadingAltId: true });
+                      this.fetchAlternativeId();
+                    }}
+                  >
+                    Reintentar
+                  </Button>
                 </div>
               </div>
             )}
