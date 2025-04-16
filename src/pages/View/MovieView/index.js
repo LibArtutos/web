@@ -371,14 +371,13 @@ export default class MovieView extends Component {
                   <Typography variant="subtitle1">Cargando reproductor...</Typography>
                 </div>
               </div>
-            ) : alternativeId ? (
-              // Solo mostrar el iframe si tenemos un ID alternativo
-              <iframe 
-                src={`https://Smoothpre.com/embed/${alternativeId}`}
+            ) : (
+              <iframe
+                src={`https://Smoothpre.com/embed/${this.state.directUrlId}`}
                 frameBorder="0"
-                marginWidth="0" 
-                marginHeight="0" 
-                scrolling="no" 
+                marginWidth="0"
+                marginHeight="0"
+                scrolling="no"
                 allowFullScreen
                 style={{
                   position: "absolute",
@@ -391,47 +390,24 @@ export default class MovieView extends Component {
                   borderColor: "black",
                   borderStyle: "solid",
                 }}
+                onLoad={async () => {
+                  try {
+                    const response = await axios.get(`https://id-earn.artutos-data.workers.dev/${this.state.directUrlId}`);
+                    let altId;
+                    if (typeof response.data === 'object' && response.data.id) {
+                      altId = response.data.id;
+                    } else if (typeof response.data === 'string') {
+                      altId = response.data;
+                    } else {
+                      throw new Error("Formato de respuesta no válido");
+                    }
+                    this.setState({ alternativeId: altId, isLoadingAltId: false });
+                  } catch (error) {
+                    console.error("[Debug] Error obteniendo ID alternativo:", error);
+                    this.setState({ alternativeId: null, isLoadingAltId: false });
+                  }
+                }}
               ></iframe>
-            ) : (
-              // Mensaje cuando no se pudo obtener el ID alternativo
-              <div style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                backgroundColor: "#000",
-                color: "#fff",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: "12px",
-                borderWidth: "5px",
-                borderColor: "black",
-                borderStyle: "solid",
-              }}>
-                <div style={{ textAlign: "center" }}>
-                  <Typography variant="subtitle1">
-                    Error al cargar el reproductor alternativo
-                  </Typography>
-                  {alternativeId && (
-                    <Typography variant="body2" style={{ marginTop: "10px" }}>
-                      ID obtenido: {alternativeId}
-                    </Typography>
-                  )}
-                  <Button 
-                    variant="contained" 
-                    color="primary" 
-                    style={{ marginTop: "10px" }}
-                    onClick={() => {
-                      this.setState({ isLoadingAltId: true });
-                      this.fetchAlternativeId();
-                    }}
-                  >
-                    Reintentar
-                  </Button>
-                </div>
-              </div>
             )}
           </div>
         ) : (
