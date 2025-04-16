@@ -52,12 +52,12 @@ export default class MovieView extends Component {
       tooltipOpen: false,
       tooltipOpen2: false,
       trailer: {},
-      // Estado simplificado para UI de selección de player
-      currentPlayer: "default", // Por defecto usamos el player original
+      // Estado modificado: ahora por defecto usamos el player alternativo si está disponible
+      currentPlayer: "alternative", // Comenzamos intentando usar el alternativo
       alternativeId: null,
       directUrlId: urlId,
       isLoadingAltId: true,
-      hasAlternativeOption: false // Nuevo estado para controlar si mostrar los botones
+      hasAlternativeOption: false
     };
     
     // Métodos existentes
@@ -126,27 +126,29 @@ export default class MovieView extends Component {
       
       // Verificar si tenemos un ID alternativo válido
       if (altId) {
-        // Si tenemos un ID válido, guardamos la opción pero mantenemos el player por defecto
-        // y mostramos los botones de selección
+        // Si tenemos un ID válido, lo usamos como opción por defecto
         this.setState({
           alternativeId: altId,
           isLoadingAltId: false,
-          hasAlternativeOption: true
+          hasAlternativeOption: true,
+          currentPlayer: "alternative" // Asegurar que usamos el player 1 por defecto
         });
       } else {
-        // Si no tenemos un ID válido, solo dejamos el player por defecto sin botones
+        // Si no tenemos un ID válido, cambiamos al player por defecto
         console.log("[Debug] No se obtuvo ID alternativo válido, usando solo player por defecto");
         this.setState({
           isLoadingAltId: false,
-          hasAlternativeOption: false
+          hasAlternativeOption: false,
+          currentPlayer: "default" // No hay alternativa, usamos el player por defecto
         });
       }
     } catch (error) {
       console.error("[Debug] Error obteniendo ID alternativo:", error);
-      // En caso de error, solo dejamos el player por defecto
+      // En caso de error, cambiamos al reproductor por defecto
       this.setState({ 
         isLoadingAltId: false,
-        hasAlternativeOption: false
+        hasAlternativeOption: false,
+        currentPlayer: "default"
       });
     }
   }
