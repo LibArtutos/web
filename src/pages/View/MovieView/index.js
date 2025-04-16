@@ -151,27 +151,64 @@ export default class MovieView extends Component {
     }
   }
   
-  // Método mejorado para manejar errores en el iframe - ahora con verificación más robusta
+  // Método mejorado para manejar errores en el iframe - específicamente para detectar 404
   handleIframeError() {
-    console.log("[Debug] Posible error en el iframe, verificando...");
+    console.log("[Debug] Error en el iframe, verificando tipo de error...");
     
-    // Solo cambiamos al reproductor por defecto si realmente hay un error
-    // y no es una falsa alerta del evento error
-    setTimeout(() => {
-      // Intentamos acceder al iframe para verificar si realmente cargó
-      const iframe = document.querySelector('iframe');
-      if (!iframe || !iframe.contentWindow || iframe.contentWindow.document.body.innerHTML === '') {
-        console.log("[Debug] Confirmado: Error en el iframe, cambiando a reproductor por defecto");
+    // Verificamos si hay algún error de red en las peticiones al servidor del iframe
+    const checkNetworkErrors = () => {
+      // Buscar errores 404 en las entradas de la consola de red
+      const isResourceMissing = performance
+        .getEntriesByType('resource')
+        .some(entry => {
+          // Verificamos si la URL contiene "Smoothpre.com/embed" y tuvo error
+          const isTargetResource = entry.name.includes('Smoothpre.com/embed');
+          const failed = (entry.transferSize === 0 && entry.encodedBodySize === 0);
+          
+          if (isTargetResource && failed) {
+            console.log("[Debug] Detectado error 404 en recurso del iframe:", entry.name);
+            return true;
+          }
+          return false;
+        });
+      
+      if (isResourceMissing) {
+        console.log("[Debug] Confirmado: Error 404 en el iframe, cambiando a reproductor por defecto");
         this.setState({ 
           iframeError: true,
           currentPlayer: "default" 
         });
-      } else {
-        console.log("[Debug] Falsa alarma: El iframe parece haber cargado correctamente");
+        return true;
       }
-    }, 1500); // Damos tiempo suficiente para que cargue
+      return false;
+    };
+    
+    // Verificación inmediata por errores de red
+    if (checkNetworkErrors()) return;
+    
+    // Si no encontramos errores de red evidentes, hacemos una verificación adicional después de un breve tiempo
+    setTimeout(() => {
+      // Si ya detectamos un error en la verificación inmediata, no hacemos nada más
+      if (this.state.iframeError) return;
+      
+      // Intentamos acceder al iframe para verificar si tiene contenido
+      try {
+        const iframe = document.querySelector('iframe');
+        // Si el iframe no existe o está vacío, cambiamos al reproductor por defecto
+        if (!iframe) {
+          console.log("[Debug] No se encontró el elemento iframe");
+          this.setState({ iframeError: true, currentPlayer: "default" });
+          return;
+        }
+        
+        // Verificación final por errores de red que pudieran haberse producido después
+        checkNetworkErrors();
+      } catch(err) {
+        console.log("[Debug] Error verificando estado del iframe:", err);
+      }
+    }, 3000); // Damos más tiempo para detectar fallos de carga
   }
-  
+
   // Método simplificado para cambios manuales entre reproductores (si se necesita en el futuro)
   handlePlayerChange(playerType) {
     this.setState({ currentPlayer: playerType });
@@ -394,21 +431,28 @@ export default class MovieView extends Component {
                   borderStyle: "solid",
                 }}
                 onError={this.handleIframeError}
+                // Añadimos un nuevo handler para detectar cuando el iframe termina de cargar (éxito o error)
                 onLoad={(e) => {
-                  try {
-                    // Mejor verificación si la carga del iframe fue exitosa
-                    const iframeContent = e.target.contentWindow || e.target.contentDocument;
-                    if (!iframeContent || iframeContent.document?.body?.innerHTML === '') {
-                      console.log("[Debug] onLoad: El iframe cargó pero parece estar vacío");
-                      this.handleIframeError();
-                    } else {
-                      console.log("[Debug] onLoad: El iframe cargó correctamente");
+                  // Verificar explícitamente si hubo un error 404
+                  setTimeout(() => {
+                    // Si todavía no se ha detectado un error, verificamos los recursos de la red
+                    if (!this.state.iframeError) {
+                      const networkError = performance
+                        .getEntriesByType('resource')
+                        .some(entry => {
+                          return entry.name.includes(`Smoothpre.com/embed/${this.state.alternativeId}`) && 
+                                 entry.transferSize === 0 && 
+                                 entry.encodedBodySize === 0;
+                        });
+                      
+                      if (networkError) {
+                        console.log("[Debug] onLoad: Detectado error 404 después de cargar");
+                        this.setState({ iframeError: true, currentPlayer: "default" });
+                      } else {
+                        console.log("[Debug] onLoad: El iframe parece haber cargado correctamente");
+                      }
                     }
-                  } catch(err) {
-                    // Si hay error al acceder al contenido, probablemente por restricciones de seguridad
-                    console.log("[Debug] No se pudo verificar el contenido del iframe:", err.message);
-                    // No llamamos a handleIframeError aquí, ya que puede ser restricción de seguridad normal
-                  }
+                  }, 1000);
                 }}
               ></iframe>
             )}
