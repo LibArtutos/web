@@ -12,46 +12,59 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
       
-      # Paso 2: Configurar Python 3.10
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.10'
-      
-      # Paso 3: Configurar Node.js 16
+      # Paso 2: Configurar Node.js 16
       - name: Set up Node.js 16
         uses: actions/setup-node@v2
         with:
           node-version: '16'
       
-      # Paso 4: Instalar dependencias de sistema
+      # Paso 3: Instalar dependencias de sistema necesarias
       - name: Install dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y python3-pip python3.10 python3.10-dev curl git gnupg
-          curl -sL https://deb.nodesource.com/setup_16.x | bash -
-          sudo apt-get install -y nodejs
-          npm install --global yarn
-          npm install --global @cloudflare/wrangler
-      
-      # Paso 5: Instalar dependencias de Python
-      - name: Install Python dependencies
-        run: |
-          curl -O https://raw.githubusercontent.com/libDrive/server/main/requirements.txt
-          pip3 install -r requirements.txt --no-cache-dir
+          sudo apt-get install -y curl git
 
-      # Paso 6: Ejecutar la instalación y compilación
-      - name: Run setup and build
+      # Paso 4: Clonar los repositorios y ejecutar la compilación
+      - name: Clone repositories and build with Yarn
         run: |
-          chmod +x ./.bin/setup.sh ./.bin/start.sh
-          ./.bin/setup.sh
+          # Crear directorios necesarios
+          mkdir -p /usr/src/app/.bin/dev/tmp
+
+          # Clonar los repositorios
+          cd /usr/src/app/.bin/dev/tmp
+          git clone "https://github.com/libDrive/server.git" --depth 1 server
+          git clone "https://github.com/libDrive/web.git" --depth 1 web
+
+          # Preparar los directorios
+          mkdir -p ./libDrive.Server/build ./libDrive.Server/src ./libDrive.Server/templates
+
+          # Instalar dependencias de Yarn y compilar
+          cd ./web
+          yarn install
+          yarn run build
+
+          # Mover los archivos generados
+          mv ./build/* ../libDrive.Server/build
           
-      # Paso 7: Crear un archivo ZIP del directorio build (o el directorio que contenga el resultado del build)
+          # Mover otros archivos necesarios
+          cd ../server
+          mv main.py requirements.txt ../libDrive.Server
+          mv ./src/* ../libDrive.Server/src
+          mv ./templates/* ../libDrive.Server/templates
+          
+          # Copiar archivos adicionales
+          cp ../../../README.md ../../../LICENSE ./libDrive.Server
+
+          # Limpiar la estructura final
+          mv ./libDrive.Server/* ../..
+          cd ../../..
+
+      # Paso 5: Crear un archivo ZIP del build
       - name: Create a ZIP of the build
         run: |
-          zip -r build_output.zip ./path/to/your/build
+          zip -r build_output.zip ./libDrive.Server
 
-      # Paso 8: Subir el archivo ZIP como artefacto
+      # Paso 6: Subir el archivo ZIP como artefacto
       - name: Upload build artifact
         uses: actions/upload-artifact@v4.6.2
         with:
