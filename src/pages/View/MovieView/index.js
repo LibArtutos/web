@@ -36,6 +36,16 @@ import {DownloadMenu, guid, PlayerMenu, seo, StarDialog, theme, TrailerDialog,} 
 export default class MovieView extends Component {
   constructor(props) {
     super(props);
+    
+    // Obtener directamente el ID de la URL al inicializar
+    const urlPath = window.location.pathname;
+    const urlMatch = urlPath.match(/\/([^\/]+)$/);
+    
+    let urlId = "";
+    if (urlMatch && urlMatch[1]) {
+      urlId = urlMatch[1];
+    }
+    
     this.state = {
       ...props.state,
       subtitleMenuAnchor: false,
@@ -45,6 +55,7 @@ export default class MovieView extends Component {
       // Nuevos estados para el reproductor alternativo
       currentPlayer: "alternative", // "alternative" (iframe) o "default" (DPlayer)
       alternativeId: null,
+      directUrlId: urlId, // Guardar el ID de la URL para usarlo mientras se carga el alternativo
       isLoadingAltId: true
     };
     
@@ -84,14 +95,8 @@ export default class MovieView extends Component {
   // Nuevo método para obtener el ID alternativo
   async fetchAlternativeId() {
     try {
-      // Obtener el ID de la URL actual
-      const urlPath = window.location.pathname;
-      const urlMatch = urlPath.match(/\/([^\/]+)$/);
-      
-      let originalId = "";
-      if (urlMatch && urlMatch[1]) {
-        originalId = urlMatch[1];
-      }
+      // Usar directamente el ID que ya obtuvimos en el constructor
+      const originalId = this.state.directUrlId;
       
       console.log("ID obtenido de la URL:", originalId);
       
@@ -100,7 +105,7 @@ export default class MovieView extends Component {
       
       // Almacenar el ID alternativo
       this.setState({
-        alternativeId: response.data.id || response.data, // Ajusta según el formato de respuesta
+        alternativeId: response.data.id || response.data,
         isLoadingAltId: false
       });
     } catch (error) {
@@ -269,6 +274,7 @@ export default class MovieView extends Component {
       // Nuevos estados
       currentPlayer,
       alternativeId,
+      directUrlId,
       isLoadingAltId
     } = this.state;
 
@@ -276,20 +282,26 @@ export default class MovieView extends Component {
       tracks = [{ name: fileName, url: file }];
     }
 
+    // ID a usar para el iframe (preferimos el alternativo si está disponible)
+    const iframeId = alternativeId || directUrlId;
+
     return (
       <div className="MovieView">
-        {/* Selector de reproductor con botones */}
+        {/* Selector de reproductor con botones mejorados */}
         <div style={{ 
           display: 'flex', 
           justifyContent: 'center', 
           margin: '0 0 15px 0'
         }}>
-          <ButtonGroup variant="contained" color="primary">
+          <ButtonGroup variant="contained">
             <Button 
               onClick={() => this.handlePlayerChange("alternative")}
               style={{ 
-                backgroundColor: currentPlayer === "alternative" ? undefined : "transparent",
-                fontWeight: currentPlayer === "alternative" ? "bold" : "normal"
+                backgroundColor: currentPlayer === "alternative" ? "#3f51b5" : "#1a237e",
+                color: "white",
+                fontWeight: currentPlayer === "alternative" ? "bold" : "normal",
+                padding: "8px 16px",
+                width: "140px"
               }}
             >
               Reproductor 1
@@ -297,8 +309,11 @@ export default class MovieView extends Component {
             <Button 
               onClick={() => this.handlePlayerChange("default")}
               style={{ 
-                backgroundColor: currentPlayer === "default" ? undefined : "transparent",
-                fontWeight: currentPlayer === "default" ? "bold" : "normal"
+                backgroundColor: currentPlayer === "default" ? "#3f51b5" : "#1a237e",
+                color: "white",
+                fontWeight: currentPlayer === "default" ? "bold" : "normal",
+                padding: "8px 16px",
+                width: "140px"
               }}
             >
               Reproductor 2
@@ -310,9 +325,9 @@ export default class MovieView extends Component {
         {currentPlayer === "alternative" ? (
           // Reproductor alternativo (iframe)
           <div className="plyr__component" style={{ position: "relative", width: "100%", height: 0, paddingBottom: "56.25%" }}>
-            {!isLoadingAltId && alternativeId ? (
+            {iframeId ? (
               <iframe 
-                src={`https://Smoothpre.com/embed/${alternativeId}`}
+                src={`https://Smoothpre.com/embed/${iframeId}`}
                 frameBorder="0"
                 marginWidth="0" 
                 marginHeight="0" 
