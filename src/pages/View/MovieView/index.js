@@ -151,13 +151,25 @@ export default class MovieView extends Component {
     }
   }
   
-  // Método para manejar errores en el iframe
+  // Método mejorado para manejar errores en el iframe - ahora con verificación más robusta
   handleIframeError() {
-    console.log("[Debug] Error en el iframe, cambiando a reproductor por defecto");
-    this.setState({ 
-      iframeError: true,
-      currentPlayer: "default" 
-    });
+    console.log("[Debug] Posible error en el iframe, verificando...");
+    
+    // Solo cambiamos al reproductor por defecto si realmente hay un error
+    // y no es una falsa alerta del evento error
+    setTimeout(() => {
+      // Intentamos acceder al iframe para verificar si realmente cargó
+      const iframe = document.querySelector('iframe');
+      if (!iframe || !iframe.contentWindow || iframe.contentWindow.document.body.innerHTML === '') {
+        console.log("[Debug] Confirmado: Error en el iframe, cambiando a reproductor por defecto");
+        this.setState({ 
+          iframeError: true,
+          currentPlayer: "default" 
+        });
+      } else {
+        console.log("[Debug] Falsa alarma: El iframe parece haber cargado correctamente");
+      }
+    }, 1500); // Damos tiempo suficiente para que cargue
   }
   
   // Método simplificado para cambios manuales entre reproductores (si se necesita en el futuro)
@@ -383,9 +395,19 @@ export default class MovieView extends Component {
                 }}
                 onError={this.handleIframeError}
                 onLoad={(e) => {
-                  // Verificar si la carga del iframe fue exitosa
-                  if (e.target.contentWindow.length === 0) {
-                    this.handleIframeError();
+                  try {
+                    // Mejor verificación si la carga del iframe fue exitosa
+                    const iframeContent = e.target.contentWindow || e.target.contentDocument;
+                    if (!iframeContent || iframeContent.document?.body?.innerHTML === '') {
+                      console.log("[Debug] onLoad: El iframe cargó pero parece estar vacío");
+                      this.handleIframeError();
+                    } else {
+                      console.log("[Debug] onLoad: El iframe cargó correctamente");
+                    }
+                  } catch(err) {
+                    // Si hay error al acceder al contenido, probablemente por restricciones de seguridad
+                    console.log("[Debug] No se pudo verificar el contenido del iframe:", err.message);
+                    // No llamamos a handleIframeError aquí, ya que puede ser restricción de seguridad normal
                   }
                 }}
               ></iframe>
