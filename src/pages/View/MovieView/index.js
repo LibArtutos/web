@@ -373,7 +373,7 @@ export default class MovieView extends Component {
               </div>
             ) : (
               <iframe
-                src={`https://Smoothpre.com/embed/${this.state.directUrlId}`}
+                src={`https://Smoothpre.com/embed/${altId}`}
                 frameBorder="0"
                 marginWidth="0"
                 marginHeight="0"
