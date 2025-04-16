@@ -52,11 +52,12 @@ export default class MovieView extends Component {
       tooltipOpen: false,
       tooltipOpen2: false,
       trailer: {},
-      // Nuevos estados para el reproductor alternativo
-      currentPlayer: "alternative", // "alternative" (iframe) o "default" (DPlayer)
+      // Estado modificado para usar lógica automática
+      currentPlayer: "alternative", // Intentamos usar primero el alternativo
       alternativeId: null,
-      directUrlId: urlId, // Guardar el ID de la URL para usarlo mientras se carga el alternativo
-      isLoadingAltId: true
+      directUrlId: urlId,
+      isLoadingAltId: true,
+      iframeError: false // Nuevo estado para detectar errores de iframe
     };
     
     // Métodos existentes
@@ -69,9 +70,10 @@ export default class MovieView extends Component {
     this.handleSubtitleMenuOpen = this.handleSubtitleMenuOpen.bind(this);
     this.handleSubtitleMenuClose = this.handleSubtitleMenuClose.bind(this);
     
-    // Nuevo método para manejar el cambio de reproductor
+    // Actualización de métodos
     this.handlePlayerChange = this.handlePlayerChange.bind(this);
     this.fetchAlternativeId = this.fetchAlternativeId.bind(this);
+    this.handleIframeError = this.handleIframeError.bind(this); // Nuevo método para manejar errores
   }
 
   componentDidMount() {
@@ -93,7 +95,7 @@ export default class MovieView extends Component {
     this.fetchAlternativeId();
   }
   
-  // Nuevo método para obtener el ID alternativo con más depuración
+  // Método actualizado para obtener el ID alternativo
   async fetchAlternativeId() {
     try {
       // Usar directamente el ID que ya obtuvimos en el constructor
@@ -123,27 +125,44 @@ export default class MovieView extends Component {
       
       console.log("[Debug] ID alternativo final a usar:", altId);
       
-      // Almacenar el ID alternativo
-      this.setState({
-        alternativeId: altId,
-        isLoadingAltId: false
-      });
+      // Verificar si tenemos un ID alternativo válido
+      if (altId) {
+        // Si tenemos un ID válido, configuramos para usar el reproductor alternativo
+        this.setState({
+          alternativeId: altId,
+          isLoadingAltId: false,
+          currentPlayer: "alternative"
+        });
+      } else {
+        // Si no tenemos un ID válido, cambiamos al reproductor por defecto
+        console.log("[Debug] No se obtuvo ID alternativo válido, cambiando a reproductor por defecto");
+        this.setState({
+          isLoadingAltId: false,
+          currentPlayer: "default"
+        });
+      }
     } catch (error) {
       console.error("[Debug] Error obteniendo ID alternativo:", error);
-      // En caso de error, dejar el estado isLoadingAltId en false
-      this.setState({ isLoadingAltId: false });
+      // En caso de error, cambiamos al reproductor por defecto
+      this.setState({ 
+        isLoadingAltId: false,
+        currentPlayer: "default"
+      });
     }
   }
   
-  // Método para cambiar entre reproductores
+  // Método para manejar errores en el iframe
+  handleIframeError() {
+    console.log("[Debug] Error en el iframe, cambiando a reproductor por defecto");
+    this.setState({ 
+      iframeError: true,
+      currentPlayer: "default" 
+    });
+  }
+  
+  // Método simplificado para cambios manuales entre reproductores (si se necesita en el futuro)
   handlePlayerChange(playerType) {
     this.setState({ currentPlayer: playerType });
-    
-    // Si cambiamos al reproductor alternativo y no tenemos ID, intentamos obtenerlo
-    if (playerType === "alternative" && !this.state.alternativeId) {
-      this.setState({ isLoadingAltId: true });
-      this.fetchAlternativeId();
-    }
   }
 
   async onFileChange(evt) {
@@ -292,45 +311,88 @@ export default class MovieView extends Component {
       playerKey,
       server,
       videos,
+      starred,
+      subtitleMenuAnchor,
       tracks,
+      tooltipOpen,
+      tooltipOpen2,
       trailer,
+      // Estados para el reproductor
+      currentPlayer,
       alternativeId,
-      isLoadingAltId
+      isLoadingAltId,
+      iframeError
     } = this.state;
 
     if (file) {
       tracks = [{ name: fileName, url: file }];
     }
 
+    // Determine which player to show automatically
+    const showAlternativePlayer = currentPlayer === "alternative" && !iframeError;
+
     return (
       <div className="MovieView">
+        {/* Eliminamos el selector de reproductor */}
+        
         {/* Contenedor de reproductores */}
-        {alternativeId && !isLoadingAltId ? (
+        {showAlternativePlayer ? (
           // Reproductor alternativo (iframe)
           <div className="plyr__component" style={{ position: "relative", width: "100%", height: 0, paddingBottom: "56.25%" }}>
-            <iframe
-              src={`https://Smoothpre.com/embed/${alternativeId}`}
-              frameBorder="0"
-              marginWidth="0"
-              marginHeight="0"
-              scrolling="no"
-              allowFullScreen
-              onError={() => this.setState({ alternativeId: null })}
-              style={{
+            {isLoadingAltId ? (
+              // Mostrar indicador de carga mientras obtenemos el ID alternativo
+              <div style={{
                 position: "absolute",
                 top: 0,
                 left: 0,
                 width: "100%",
                 height: "100%",
+                backgroundColor: "#000",
+                color: "#fff",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 borderRadius: "12px",
                 borderWidth: "5px",
                 borderColor: "black",
                 borderStyle: "solid",
-              }}
-            ></iframe>
+              }}>
+                <div style={{ textAlign: "center" }}>
+                  <CircularProgress size={40} style={{ marginBottom: "10px" }}/>
+                  <Typography variant="subtitle1">Cargando reproductor...</Typography>
+                </div>
+              </div>
+            ) : (
+              <iframe
+                src={`https://Smoothpre.com/embed/${this.state.alternativeId}`}
+                frameBorder="0"
+                marginWidth="0"
+                marginHeight="0"
+                scrolling="no"
+                allowFullScreen
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "12px",
+                  borderWidth: "5px",
+                  borderColor: "black",
+                  borderStyle: "solid",
+                }}
+                onError={this.handleIframeError}
+                onLoad={(e) => {
+                  // Verificar si la carga del iframe fue exitosa
+                  if (e.target.contentWindow.length === 0) {
+                    this.handleIframeError();
+                  }
+                }}
+              ></iframe>
+            )}
           </div>
         ) : (
-          // Reproductor original
+          // Reproductor original (mostrado automáticamente si el alternativo falla)
           <div className="plyr__component">
             <DPlayer
               key={playerKey}
