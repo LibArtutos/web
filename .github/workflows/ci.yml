@@ -1,0 +1,61 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main # O cualquier rama que desees
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    
+    steps:
+      # Paso 1: Revisar el código fuente
+      - name: Check out repository
+        uses: actions/checkout@v2
+      
+      # Paso 2: Configurar Python 3.9
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      
+      # Paso 3: Configurar Node.js 16
+      - name: Set up Node.js 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      
+      # Paso 4: Instalar dependencias de sistema
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y python3-pip python3.9 python3.9-dev curl git gnupg
+          curl -sL https://deb.nodesource.com/setup_16.x | bash -
+          sudo apt-get install -y nodejs
+          npm install --global yarn
+          npm install --global @cloudflare/wrangler
+      
+      # Paso 5: Instalar dependencias de Python
+      - name: Install Python dependencies
+        run: |
+          curl -O https://raw.githubusercontent.com/libDrive/server/main/requirements.txt
+          pip3 install -r requirements.txt --no-cache-dir
+
+      # Paso 6: Ejecutar la instalación y compilación
+      - name: Run setup and build
+        run: |
+          chmod +x ./.bin/setup.sh ./.bin/start.sh
+          ./.bin/setup.sh
+          
+      # Paso 7: Crear un archivo ZIP del directorio build (o el directorio que contenga el resultado del build)
+      - name: Create a ZIP of the build
+        run: |
+          zip -r build_output.zip ./path/to/your/build
+
+      # Paso 8: Subir el archivo ZIP como artefacto
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-output
+          path: build_output.zip
