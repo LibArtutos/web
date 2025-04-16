@@ -411,7 +411,14 @@ export default class MovieView extends Component {
                 borderStyle: "solid",
               }}>
                 <div style={{ textAlign: "center" }}>
-                  <Typography variant="subtitle1">Error al cargar el reproductor alternativo</Typography>
+                  <Typography variant="subtitle1">
+                    Error al cargar el reproductor alternativo
+                  </Typography>
+                  {alternativeId && (
+                    <Typography variant="body2" style={{ marginTop: "10px" }}>
+                      ID obtenido: {alternativeId}
+                    </Typography>
+                  )}
                   <Button 
                     variant="contained" 
                     color="primary" 
