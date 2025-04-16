@@ -30,7 +30,8 @@ import "@sweetalert2/theme-dark/dark.css";
 
 import axios from "axios";
 
-import {DownloadMenu, guid, PlayerMenu, seo, StarDialog, theme, TrailerDialog,} from "components";
+import {DownloadMenu, guid, PlayerMenu, seo, StarDialog, theme, TrailerDialog,} from "../../../components";
+
 
 export default class MovieView extends Component {
   constructor(props) {
