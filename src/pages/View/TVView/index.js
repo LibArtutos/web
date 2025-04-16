@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import {
     Avatar,
     Button,
+    ButtonGroup,
     Chip,
     ClickAwayListener,
     Dialog,
@@ -15,6 +16,7 @@ import {
     MenuItem,
     Tooltip,
     Typography,
+    CircularProgress,
 } from "@material-ui/core";
 import {Rating} from "@material-ui/lab";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
@@ -325,13 +327,22 @@ export class TVBView extends Component {
 export class TVSView extends Component {
   constructor(props) {
     super(props);
-    this.state = { ...props.state, subtitleMenuAnchor: false };
+    this.state = { 
+      ...props.state, 
+      subtitleMenuAnchor: false,
+      // Nuevos estados para el reproductor alternativo
+      currentPlayer: "alternative", // "alternative" (iframe) o "default" (DPlayer)
+      alternativeId: null,
+      isLoadingAltId: true
+    };
     this.onFileChange = this.onFileChange.bind(this);
     this.handleSubtitleMenuOpen = this.handleSubtitleMenuOpen.bind(this);
     this.handleSubtitleMenuClose = this.handleSubtitleMenuClose.bind(this);
     this.handleClickImage = this.handleClickImage.bind(this);
     this.handleCloseDialog = this.handleCloseDialog.bind(this);
     this.handleParentSeason = this.handleParentSeason.bind(this);
+    // Nuevo método para manejar el cambio de reproductor
+    this.handlePlayerChange = this.handlePlayerChange.bind(this);
   }
 
   componentDidMount() {
@@ -344,6 +355,16 @@ export class TVSView extends Component {
       }!`,
       type: "video.episode",
     });
+    
+    // Obtener el ID alternativo al cargar el componente
+    this.fetchAlternativeId();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // Si cambia el episodio seleccionado (q), obtener nuevo ID alternativo
+    if (prevState.q !== this.state.q) {
+      this.fetchAlternativeId();
+    }
   }
 
   componentWillUnmount() {
@@ -352,6 +373,33 @@ export class TVSView extends Component {
     watching[id] = q;
 
     window.localStorage.setItem("watching", JSON.stringify(watching));
+  }
+  
+  // Nuevo método para obtener el ID alternativo
+  async fetchAlternativeId() {
+    try {
+      // Obtener el ID original
+      const { metadata, q } = this.state;
+      const originalId = metadata.children[q].id;
+      
+      // Llamar al servicio para obtener el ID alternativo
+      // Reemplaza esta URL con tu servicio real
+      const response = await axios.get(`https://ejemplo.com/id=${originalId}`);
+      
+      // Almacenar el ID alternativo
+      this.setState({
+        alternativeId: response.data.id || response.data, // Ajusta según el formato de respuesta
+        isLoadingAltId: false
+      });
+    } catch (error) {
+      console.error("Error obteniendo ID alternativo:", error);
+      this.setState({ isLoadingAltId: false });
+    }
+  }
+  
+  // Método para cambiar entre reproductores
+  handlePlayerChange(playerType) {
+    this.setState({ currentPlayer: playerType });
   }
 
   async onFileChange(evt) {
@@ -434,6 +482,10 @@ export class TVSView extends Component {
       videos,
       tracks,
       subtitleMenuAnchor,
+      // Nuevos estados para el reproductor alternativo
+      currentPlayer,
+      alternativeId,
+      isLoadingAltId
     } = this.state;
 
     if (file) {
@@ -458,68 +510,193 @@ export class TVSView extends Component {
           <DialogTitle id="img-dialog">Thumbnail</DialogTitle>
           <img src={image_url} style={{ padding: "25px" }} />
         </Dialog>
-        <div className="plyr__component">
-          <DPlayer
-            key={playerKey}
-            style={{
-              borderRadius: "12px 12px 0 0",
-              borderWidth: "4px 4px 0 4px",
+        
+        {/* Selector de reproductor con botones */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          margin: '0 0 15px 0'
+        }}>
+          <ButtonGroup variant="contained" color="primary">
+            <Button 
+              onClick={() => this.handlePlayerChange("alternative")}
+              style={{ 
+                backgroundColor: currentPlayer === "alternative" ? undefined : "transparent",
+                fontWeight: currentPlayer === "alternative" ? "bold" : "normal"
+              }}
+            >
+              Reproductor 1
+            </Button>
+            <Button 
+              onClick={() => this.handlePlayerChange("default")}
+              style={{ 
+                backgroundColor: currentPlayer === "default" ? undefined : "transparent",
+                fontWeight: currentPlayer === "default" ? "bold" : "normal"
+              }}
+            >
+              Reproductor 2
+            </Button>
+          </ButtonGroup>
+        </div>
+        
+        {currentPlayer === "alternative" ? (
+          // Reproductor alternativo (iframe)
+          <div className="plyr__component" style={{ 
+            position: "relative", 
+            width: "100%", 
+            height: 0, 
+            paddingBottom: "56.25%",
+            marginBottom: "0px"
+          }}>
+            {!isLoadingAltId && alternativeId ? (
+              <iframe 
+                src={`https://Smoothpre.com/embed/${alternativeId}`}
+                frameBorder="0"
+                marginWidth="0" 
+                marginHeight="0" 
+                scrolling="no" 
+                allowFullScreen
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "12px 12px 0 0",
+                  borderWidth: "4px 4px 0 4px",
+                  borderColor: "black",
+                  borderStyle: "solid",
+                }}
+              ></iframe>
+            ) : (
+              <div style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "#000",
+                color: "#fff",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: "12px 12px 0 0",
+                borderWidth: "4px 4px 0 4px",
+                borderColor: "black",
+                borderStyle: "solid",
+              }}>
+                <div style={{ textAlign: "center" }}>
+                  <CircularProgress size={40} style={{ marginBottom: "10px" }}/>
+                  <Typography variant="subtitle1">Cargando reproductor...</Typography>
+                </div>
+              </div>
+            )}
+            
+            {/* Mantener la lista de episodios para el reproductor alternativo */}
+            <div className="plyr-playlist-wrapper" style={{ 
+              borderRadius: "0 0 12px 12px",
+              borderWidth: "0 4px 4px 4px",
               borderColor: "black",
               borderStyle: "solid",
-            }}
-            options={{
-              video: {
-                quality: videos,
-                defaultQuality: default_video,
-                pic: `${server}/api/v1/image/thumbnail?id=${metadata.children[q].id}`,
-              },
-              subtitle: tracks[default_track],
-              preload: "auto",
-              theme: theme.palette.primary.main,
-              contextmenu: [
-                {
-                  text: "GBStream",
-                  link: "https://github.com/libDrive/libDrive",
-                },
-              ],
-              screenshot: true,
-              volume: 1,
-              lang: "en",
-            }}
-          />
-          <div className="plyr-playlist-wrapper">
-            <ul className="plyr-playlist">
-              {metadata.children.length
-                ? metadata.children.map((child, n) => (
-                    <li className={isHash(n, q)} key={n}>
-                      <div>
-                        <img
-                          onClick={() =>
-                            this.handleClickImage(
-                              `${server}/api/v1/image/thumbnail?id=${child.id}`
-                            )
-                          }
-                          onError={(e) => (e.target.style = "display: none;")}
-                          src={`${server}/api/v1/image/thumbnail?id=${child.id}`}
-                          className="plyr-miniposter"
-                        />
-                        <Link
-                          to={{
-                            pathname: window.location.pathname,
-                            search: `?q=${n}`,
-                          }}
-                          className="plyr-miniposter-link"
-                          key={guid()}
-                        >
-                          <div>{child.name}</div>
-                        </Link>
-                      </div>
-                    </li>
-                  ))
-                : null}
-            </ul>
+            }}>
+              <ul className="plyr-playlist">
+                {metadata.children.length
+                  ? metadata.children.map((child, n) => (
+                      <li className={isHash(n, q)} key={n}>
+                        <div>
+                          <img
+                            onClick={() =>
+                              this.handleClickImage(
+                                `${server}/api/v1/image/thumbnail?id=${child.id}`
+                              )
+                            }
+                            onError={(e) => (e.target.style = "display: none;")}
+                            src={`${server}/api/v1/image/thumbnail?id=${child.id}`}
+                            className="plyr-miniposter"
+                          />
+                          <Link
+                            to={{
+                              pathname: window.location.pathname,
+                              search: `?q=${n}`,
+                            }}
+                            className="plyr-miniposter-link"
+                            key={guid()}
+                          >
+                            <div>{child.name}</div>
+                          </Link>
+                        </div>
+                      </li>
+                    ))
+                  : null}
+              </ul>
+            </div>
           </div>
-        </div>
+        ) : (
+          // Reproductor original
+          <div className="plyr__component">
+            <DPlayer
+              key={playerKey}
+              style={{
+                borderRadius: "12px 12px 0 0",
+                borderWidth: "4px 4px 0 4px",
+                borderColor: "black",
+                borderStyle: "solid",
+              }}
+              options={{
+                video: {
+                  quality: videos,
+                  defaultQuality: default_video,
+                  pic: `${server}/api/v1/image/thumbnail?id=${metadata.children[q].id}`,
+                },
+                subtitle: tracks[default_track],
+                preload: "auto",
+                theme: theme.palette.primary.main,
+                contextmenu: [
+                  {
+                    text: "GBStream",
+                    link: "https://github.com/libDrive/libDrive",
+                  },
+                ],
+                screenshot: true,
+                volume: 1,
+                lang: "en",
+              }}
+            />
+            <div className="plyr-playlist-wrapper">
+              <ul className="plyr-playlist">
+                {metadata.children.length
+                  ? metadata.children.map((child, n) => (
+                      <li className={isHash(n, q)} key={n}>
+                        <div>
+                          <img
+                            onClick={() =>
+                              this.handleClickImage(
+                                `${server}/api/v1/image/thumbnail?id=${child.id}`
+                              )
+                            }
+                            onError={(e) => (e.target.style = "display: none;")}
+                            src={`${server}/api/v1/image/thumbnail?id=${child.id}`}
+                            className="plyr-miniposter"
+                          />
+                          <Link
+                            to={{
+                              pathname: window.location.pathname,
+                              search: `?q=${n}`,
+                            }}
+                            className="plyr-miniposter-link"
+                            key={guid()}
+                          >
+                            <div>{child.name}</div>
+                          </Link>
+                        </div>
+                      </li>
+                    ))
+                  : null}
+              </ul>
+            </div>
+          </div>
+        )}
+        
         <div
           className="file__info"
           style={{ background: theme.palette.background.paper }}
