@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-22.04
     
     steps:
-      # Paso 1: Revisar el código fuente
+      # Paso 1: Revisar el código fuente (el código ya está en el repositorio)
       - name: Check out repository
         uses: actions/checkout@v2
       
@@ -18,51 +18,26 @@ jobs:
         with:
           node-version: '16'
       
-      # Paso 3: Instalar dependencias de sistema necesarias
+      # Paso 3: Instalar dependencias necesarias (solo curl y git)
       - name: Install dependencies
         run: |
           sudo apt-get update -y
           sudo apt-get install -y curl git
 
-      # Paso 4: Clonar los repositorios y ejecutar la compilación
-      - name: Clone repositories and build with Yarn
+      # Paso 4: Instalar dependencias de Yarn y compilar el proyecto
+      - name: Install dependencies and build with Yarn
         run: |
-          # Crear directorios necesarios
-          mkdir -p /usr/src/app/.bin/dev/tmp
-
-          # Clonar los repositorios
-          cd /usr/src/app/.bin/dev/tmp
-          git clone "https://github.com/libDrive/server.git" --depth 1 server
-          git clone "https://github.com/libDrive/web.git" --depth 1 web
-
-          # Preparar los directorios
-          mkdir -p ./libDrive.Server/build ./libDrive.Server/src ./libDrive.Server/templates
-
-          # Instalar dependencias de Yarn y compilar
-          cd ./web
+          # Instalación de dependencias con Yarn
           yarn install
+          
+          # Ejecutar el build de Yarn
           yarn run build
-
-          # Mover los archivos generados
-          mv ./build/* ../libDrive.Server/build
-          
-          # Mover otros archivos necesarios
-          cd ../server
-          mv main.py requirements.txt ../libDrive.Server
-          mv ./src/* ../libDrive.Server/src
-          mv ./templates/* ../libDrive.Server/templates
-          
-          # Copiar archivos adicionales
-          cp ../../../README.md ../../../LICENSE ./libDrive.Server
-
-          # Limpiar la estructura final
-          mv ./libDrive.Server/* ../..
-          cd ../../..
 
       # Paso 5: Crear un archivo ZIP del build
       - name: Create a ZIP of the build
         run: |
-          zip -r build_output.zip ./libDrive.Server
+          # Crear un archivo ZIP con la salida de la compilación
+          zip -r build_output.zip ./build
 
       # Paso 6: Subir el archivo ZIP como artefacto
       - name: Upload build artifact
