@@ -330,10 +330,11 @@ export class TVSView extends Component {
     this.state = { 
       ...props.state, 
       subtitleMenuAnchor: false,
-      // Nuevos estados para el reproductor alternativo
-      currentPlayer: "alternative", // "alternative" (iframe) o "default" (DPlayer)
+      // Estados para el reproductor alternativo
+      currentPlayer: "alternative", // Por defecto usamos el alternativo
       alternativeId: null,
-      isLoadingAltId: true
+      isLoadingAltId: true,
+      hasAlternativeOption: false // Para controlar si mostrar los botones
     };
     this.onFileChange = this.onFileChange.bind(this);
     this.handleSubtitleMenuOpen = this.handleSubtitleMenuOpen.bind(this);
@@ -343,6 +344,7 @@ export class TVSView extends Component {
     this.handleParentSeason = this.handleParentSeason.bind(this);
     // Nuevo método para manejar el cambio de reproductor
     this.handlePlayerChange = this.handlePlayerChange.bind(this);
+    this.fetchAlternativeId = this.fetchAlternativeId.bind(this);
   }
 
   componentDidMount() {
@@ -387,20 +389,48 @@ export class TVSView extends Component {
         originalId = urlMatch[1];
       }
       
-      console.log("ID del episodio obtenido de la URL:", originalId);
+      console.log("[Debug] ID del episodio obtenido de la URL:", originalId);
       
       // Llamar al servicio para obtener el ID alternativo
       const response = await axios.get(`https://id-earn.artutos-data.workers.dev/${originalId}`);
       
-      this.setState({
-        alternativeId: response.data.id || response.data,
-        isLoadingAltId: false
-      });
+      // Determinar el ID alternativo correctamente
+      let altId;
+      if (typeof response.data === 'object' && response.data.id) {
+        altId = response.data.id;
+      } else if (typeof response.data === 'string') {
+        altId = response.data;
+      } else {
+        console.error("[Debug] No se pudo determinar el ID alternativo:", response.data);
+        altId = null;
+      }
+      
+      // Si tenemos un ID válido, usamos el reproductor alternativo
+      if (altId) {
+        this.setState({
+          alternativeId: altId,
+          isLoadingAltId: false,
+          hasAlternativeOption: true,
+          currentPlayer: "alternative" // Por defecto player 1
+        });
+      } else {
+        // Si no hay ID alternativo, solo mostramos el reproductor por defecto
+        this.setState({ 
+          isLoadingAltId: false,
+          hasAlternativeOption: false,
+          currentPlayer: "default"
+        });
+      }
     } catch (error) {
-      console.error("Error obteniendo ID alternativo para episodio:", error);
-      this.setState({ isLoadingAltId: false });
+      console.error("[Debug] Error obteniendo ID alternativo:", error);
+      // En caso de error, solo mostramos el reproductor por defecto
+      this.setState({ 
+        isLoadingAltId: false,
+        hasAlternativeOption: false,
+        currentPlayer: "default"
+      });
     }
-  } 
+  }
 
   // Método para cambiar entre reproductores
   handlePlayerChange(playerType) {
@@ -516,35 +546,43 @@ export class TVSView extends Component {
           <img src={image_url} style={{ padding: "25px" }} />
         </Dialog>
         
-        {/* Selector de reproductor con botones */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          margin: '0 0 15px 0'
-        }}>
-          <ButtonGroup variant="contained" color="primary">
-            <Button 
+        {/* Botones de selección de reproductor - solo si hay opción alternativa */}
+        {this.state.hasAlternativeOption && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            marginBottom: '15px',
+            gap: '10px' 
+          }}>
+            <Button
+              variant={currentPlayer === "alternative" ? "contained" : "outlined"}
+              color="primary"
               onClick={() => this.handlePlayerChange("alternative")}
-              style={{ 
-                backgroundColor: currentPlayer === "alternative" ? undefined : "transparent",
-                fontWeight: currentPlayer === "alternative" ? "bold" : "normal"
+              style={{
+                fontWeight: currentPlayer === "alternative" ? "bold" : "normal",
+                minWidth: "150px",
+                borderRadius: "20px"
               }}
             >
-              Reproductor 1
+              Player 1
             </Button>
-            <Button 
+            <Button
+              variant={currentPlayer === "default" ? "contained" : "outlined"}
+              color="primary"
               onClick={() => this.handlePlayerChange("default")}
-              style={{ 
-                backgroundColor: currentPlayer === "default" ? undefined : "transparent",
-                fontWeight: currentPlayer === "default" ? "bold" : "normal"
+              style={{
+                fontWeight: currentPlayer === "default" ? "bold" : "normal",
+                minWidth: "150px",
+                borderRadius: "20px"
               }}
             >
-              Reproductor 2
+              Player 2
             </Button>
-          </ButtonGroup>
-        </div>
+          </div>
+        )}
         
-        {currentPlayer === "alternative" ? (
+        {/* Contenedor de reproductores */}
+        {currentPlayer === "alternative" && this.state.hasAlternativeOption ? (
           // Reproductor alternativo (iframe)
           <div className="plyr__component" style={{ 
             position: "relative", 
@@ -553,27 +591,7 @@ export class TVSView extends Component {
             paddingBottom: "56.25%",
             marginBottom: "0px"
           }}>
-            {!isLoadingAltId && alternativeId ? (
-              <iframe 
-                src={`https://Smoothpre.com/embed/${alternativeId}`}
-                frameBorder="0"
-                marginWidth="0" 
-                marginHeight="0" 
-                scrolling="no" 
-                allowFullScreen
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "12px 12px 0 0",
-                  borderWidth: "4px 4px 0 4px",
-                  borderColor: "black",
-                  borderStyle: "solid",
-                }}
-              ></iframe>
-            ) : (
+            {isLoadingAltId ? (
               <div style={{
                 position: "absolute",
                 top: 0,
@@ -595,6 +613,26 @@ export class TVSView extends Component {
                   <Typography variant="subtitle1">Cargando reproductor...</Typography>
                 </div>
               </div>
+            ) : (
+              <iframe 
+                src={`https://Smoothpre.com/embed/${alternativeId}`}
+                frameBorder="0"
+                marginWidth="0" 
+                marginHeight="0" 
+                scrolling="no" 
+                allowFullScreen
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "12px 12px 0 0",
+                  borderWidth: "4px 4px 0 4px",
+                  borderColor: "black",
+                  borderStyle: "solid",
+                }}
+              ></iframe>
             )}
             
             {/* Mantener la lista de episodios para el reproductor alternativo */}
