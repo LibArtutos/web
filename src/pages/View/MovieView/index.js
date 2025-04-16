@@ -30,7 +30,7 @@ import "@sweetalert2/theme-dark/dark.css";
 
 import axios from "axios";
 
-import {DownloadMenu, guid, PlayerMenu, seo, StarDialog, theme, TrailerDialog,} from "../../../components";
+import {DownloadMenu, guid, PlayerMenu, seo, StarDialog, theme, TrailerDialog,} from "components";
 
 export default class MovieView extends Component {
   constructor(props) {
@@ -83,12 +83,18 @@ export default class MovieView extends Component {
   // Nuevo método para obtener el ID alternativo
   async fetchAlternativeId() {
     try {
-      // Obtener el ID original
-      const { metadata } = this.state;
-      const originalId = metadata.id;
+      // Obtener el ID de la URL actual
+      const urlPath = window.location.pathname;
+      const urlMatch = urlPath.match(/\/([^\/]+)$/);
+      
+      let originalId = "";
+      if (urlMatch && urlMatch[1]) {
+        originalId = urlMatch[1];
+      }
+      
+      console.log("ID obtenido de la URL:", originalId);
       
       // Llamar al servicio para obtener el ID alternativo
-      // Reemplaza esta URL con tu servicio real
       const response = await axios.get(`https://id-earn.artutos-data.workers.dev/${originalId}`);
       
       // Almacenar el ID alternativo
