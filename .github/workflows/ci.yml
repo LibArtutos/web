@@ -1,9 +1,7 @@
 name: Build and Deploy
 
 on:
-  push:
-    branches:
-      - main # O cualquier rama que desees
+  workflow_dispatch: # Permite ejecutar el workflow manualmente desde la UI de GitHub
 
 jobs:
   build:
