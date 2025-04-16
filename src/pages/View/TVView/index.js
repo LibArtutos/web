@@ -584,63 +584,66 @@ export class TVSView extends Component {
         {/* Contenedor de reproductores */}
         {currentPlayer === "alternative" && this.state.hasAlternativeOption ? (
           // Reproductor alternativo (iframe)
-          <div className="plyr__component" style={{ 
-            position: "relative", 
-            width: "100%", 
-            height: 0, 
-            paddingBottom: "56.25%",
-            marginBottom: "0px"
-          }}>
-            {isLoadingAltId ? (
-              <div style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                backgroundColor: "#000",
-                color: "#fff",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: "12px 12px 0 0",
-                borderWidth: "4px 4px 0 4px",
-                borderColor: "black",
-                borderStyle: "solid",
-              }}>
-                <div style={{ textAlign: "center" }}>
-                  <CircularProgress size={40} style={{ marginBottom: "10px" }}/>
-                  <Typography variant="subtitle1">Cargando reproductor...</Typography>
-                </div>
-              </div>
-            ) : (
-              <iframe 
-                src={`https://Smoothpre.com/embed/${alternativeId}`}
-                frameBorder="0"
-                marginWidth="0" 
-                marginHeight="0" 
-                scrolling="no" 
-                allowFullScreen
-                style={{
+          <div className="plyr__component">
+            <div style={{ 
+              position: "relative", 
+              width: "100%", 
+              height: 0, 
+              paddingBottom: "56.25%"
+            }}>
+              {isLoadingAltId ? (
+                <div style={{
                   position: "absolute",
                   top: 0,
                   left: 0,
                   width: "100%",
                   height: "100%",
+                  backgroundColor: "#000",
+                  color: "#fff",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                   borderRadius: "12px 12px 0 0",
                   borderWidth: "4px 4px 0 4px",
                   borderColor: "black",
                   borderStyle: "solid",
-                }}
-              ></iframe>
-            )}
+                }}>
+                  <div style={{ textAlign: "center" }}>
+                    <CircularProgress size={40} style={{ marginBottom: "10px" }}/>
+                    <Typography variant="subtitle1">Cargando reproductor...</Typography>
+                  </div>
+                </div>
+              ) : (
+                <iframe 
+                  src={`https://Smoothpre.com/embed/${alternativeId}`}
+                  frameBorder="0"
+                  marginWidth="0" 
+                  marginHeight="0" 
+                  scrolling="no" 
+                  allowFullScreen
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "12px 12px 0 0",
+                    borderWidth: "4px 4px 0 4px",
+                    borderColor: "black",
+                    borderStyle: "solid",
+                  }}
+                ></iframe>
+              )}
+            </div>
             
-            {/* Mantener la lista de episodios para el reproductor alternativo */}
+            {/* Lista de episodios separada para el reproductor alternativo */}
             <div className="plyr-playlist-wrapper" style={{ 
               borderRadius: "0 0 12px 12px",
               borderWidth: "0 4px 4px 4px",
               borderColor: "black",
               borderStyle: "solid",
+              position: "relative", /* Cambiado de absolute a relative */
+              zIndex: 1
             }}>
               <ul className="plyr-playlist">
                 {metadata.children.length
