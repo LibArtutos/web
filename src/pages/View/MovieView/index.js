@@ -52,12 +52,12 @@ export default class MovieView extends Component {
       tooltipOpen: false,
       tooltipOpen2: false,
       trailer: {},
-      // Estado modificado para usar lógica automática
-      currentPlayer: "alternative", // Intentamos usar primero el alternativo
+      // Estado simplificado para UI de selección de player
+      currentPlayer: "default", // Por defecto usamos el player original
       alternativeId: null,
       directUrlId: urlId,
       isLoadingAltId: true,
-      iframeError: false // Nuevo estado para detectar errores de iframe
+      hasAlternativeOption: false // Nuevo estado para controlar si mostrar los botones
     };
     
     // Métodos existentes
@@ -73,7 +73,6 @@ export default class MovieView extends Component {
     // Actualización de métodos
     this.handlePlayerChange = this.handlePlayerChange.bind(this);
     this.fetchAlternativeId = this.fetchAlternativeId.bind(this);
-    this.handleIframeError = this.handleIframeError.bind(this); // Nuevo método para manejar errores
   }
 
   componentDidMount() {
@@ -127,41 +126,32 @@ export default class MovieView extends Component {
       
       // Verificar si tenemos un ID alternativo válido
       if (altId) {
-        // Si tenemos un ID válido, configuramos para usar el reproductor alternativo
+        // Si tenemos un ID válido, guardamos la opción pero mantenemos el player por defecto
+        // y mostramos los botones de selección
         this.setState({
           alternativeId: altId,
           isLoadingAltId: false,
-          currentPlayer: "alternative"
+          hasAlternativeOption: true
         });
       } else {
-        // Si no tenemos un ID válido, cambiamos al reproductor por defecto
-        console.log("[Debug] No se obtuvo ID alternativo válido, cambiando a reproductor por defecto");
+        // Si no tenemos un ID válido, solo dejamos el player por defecto sin botones
+        console.log("[Debug] No se obtuvo ID alternativo válido, usando solo player por defecto");
         this.setState({
           isLoadingAltId: false,
-          currentPlayer: "default"
+          hasAlternativeOption: false
         });
       }
     } catch (error) {
       console.error("[Debug] Error obteniendo ID alternativo:", error);
-      // En caso de error, cambiamos al reproductor por defecto
+      // En caso de error, solo dejamos el player por defecto
       this.setState({ 
         isLoadingAltId: false,
-        currentPlayer: "default"
+        hasAlternativeOption: false
       });
     }
   }
   
-  // Método mejorado para manejar errores en el iframe - simplificado y más directo
-  handleIframeError() {
-    console.log("[Debug] Error en el iframe detectado por evento onError");
-    // Cambiar inmediatamente al reproductor por defecto
-    this.setState({ 
-      iframeError: true,
-      currentPlayer: "default" 
-    });
-  }
-
-  // Método simplificado para cambios manuales entre reproductores (si se necesita en el futuro)
+  // Método simplificado para cambiar entre reproductores
   handlePlayerChange(playerType) {
     this.setState({ currentPlayer: playerType });
   }
@@ -322,22 +312,52 @@ export default class MovieView extends Component {
       currentPlayer,
       alternativeId,
       isLoadingAltId,
-      iframeError
+      hasAlternativeOption
     } = this.state;
 
     if (file) {
       tracks = [{ name: fileName, url: file }];
     }
 
-    // Determine which player to show automatically
-    const showAlternativePlayer = currentPlayer === "alternative" && !iframeError;
-
     return (
       <div className="MovieView">
-        {/* Eliminamos el selector de reproductor */}
+        {/* Botones de selección de reproductor - solo si hay opción alternativa */}
+        {hasAlternativeOption && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            marginBottom: '15px',
+            gap: '10px' 
+          }}>
+            <Button
+              variant={currentPlayer === "alternative" ? "contained" : "outlined"}
+              color="primary"
+              onClick={() => this.handlePlayerChange("alternative")}
+              style={{
+                fontWeight: currentPlayer === "alternative" ? "bold" : "normal",
+                minWidth: "150px",
+                borderRadius: "20px"
+              }}
+            >
+              Player 1
+            </Button>
+            <Button
+              variant={currentPlayer === "default" ? "contained" : "outlined"}
+              color="primary"
+              onClick={() => this.handlePlayerChange("default")}
+              style={{
+                fontWeight: currentPlayer === "default" ? "bold" : "normal",
+                minWidth: "150px",
+                borderRadius: "20px"
+              }}
+            >
+              Player 2
+            </Button>
+          </div>
+        )}
         
         {/* Contenedor de reproductores */}
-        {showAlternativePlayer ? (
+        {currentPlayer === "alternative" && hasAlternativeOption ? (
           // Reproductor alternativo (iframe)
           <div className="plyr__component" style={{ position: "relative", width: "100%", height: 0, paddingBottom: "56.25%" }}>
             {isLoadingAltId ? (
@@ -382,68 +402,11 @@ export default class MovieView extends Component {
                   borderColor: "black",
                   borderStyle: "solid",
                 }}
-                onError={this.handleIframeError}
-                onLoad={() => {
-                  // Método simplificado: verificar directamente en la consola si hubo error 404
-                  let foundError = false;
-                  
-                  // Esperamos un momento para que los mensajes de error se registren en la consola
-                  setTimeout(() => {
-                    // Verificación simplificada: si hay un 404 en la consola, cambiamos al player por defecto
-                    const errorPattern = /Failed to load resource.*404/i;
-                    
-                    // Verificamos si la URL del iframe es válida intentando hacer un fetch
-                    fetch(`https://Smoothpre.com/embed/${this.state.alternativeId}`, { 
-                      method: 'HEAD',
-                      mode: 'no-cors' // Esto evita errores CORS pero no nos da info sobre status
-                    })
-                    .catch(() => {
-                      // Si hay un error con el fetch, probablemente la URL no es válida
-                      console.log("[Debug] Error al verificar URL del iframe, cambiando a player por defecto");
-                      if (!this.state.iframeError) {
-                        this.setState({ iframeError: true, currentPlayer: "default" });
-                      }
-                    });
-                    
-                    // Verificar el estado del iframe después de cargar
-                    const iframe = document.querySelector('iframe');
-                    if (!iframe || !iframe.contentWindow) {
-                      foundError = true;
-                    } else {
-                      try {
-                        // Si no podemos acceder al documento del iframe, probablemente sea un error de origen cruzado o 404
-                        const doc = iframe.contentWindow.document;
-                        if (!doc || doc.body.innerHTML.trim() === '') {
-                          foundError = true;
-                        }
-                      } catch (err) {
-                        // Error de seguridad al intentar acceder - necesitamos verificar de otra manera
-                        console.log("[Debug] No se puede acceder al contenido del iframe, verificando elementos de red");
-                        
-                        // Verificar directamente en los registros del performance API
-                        const entries = performance.getEntriesByType('resource')
-                          .filter(entry => entry.name.includes('Smoothpre.com/embed'));
-                        
-                        // Si no encontramos entradas o hay alguna entrada con error, asumimos que falló
-                        if (entries.length === 0) {
-                          foundError = true;
-                          console.log("[Debug] No hay recursos del iframe registrados");
-                        }
-                      }
-                    }
-                    
-                    // Si detectamos un error, cambiamos al reproductor por defecto
-                    if (foundError && !this.state.iframeError) {
-                      console.log("[Debug] Se detectó un problema con el iframe, cambiando a reproductor por defecto");
-                      this.setState({ iframeError: true, currentPlayer: "default" });
-                    }
-                  }, 1000);
-                }}
               ></iframe>
             )}
           </div>
         ) : (
-          // Reproductor original (mostrado automáticamente si el alternativo falla)
+          // Reproductor original
           <div className="plyr__component">
             <DPlayer
               key={playerKey}
