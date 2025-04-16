@@ -292,14 +292,8 @@ export default class MovieView extends Component {
       playerKey,
       server,
       videos,
-      starred,
-      subtitleMenuAnchor,
       tracks,
-      tooltipOpen,
-      tooltipOpen2,
       trailer,
-      // Nuevos estados
-      currentPlayer,
       alternativeId,
       isLoadingAltId
     } = this.state;
@@ -310,88 +304,30 @@ export default class MovieView extends Component {
 
     return (
       <div className="MovieView">
-        {/* Selector de reproductor con botones mejorados */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          margin: '0 0 15px 0'
-        }}>
-          <ButtonGroup variant="contained">
-            <Button 
-              onClick={() => this.handlePlayerChange("alternative")}
-              style={{ 
-                backgroundColor: currentPlayer === "alternative" ? "#3f51b5" : "#1a237e",
-                color: "white",
-                fontWeight: currentPlayer === "alternative" ? "bold" : "normal",
-                padding: "8px 16px",
-                width: "140px"
-              }}
-            >
-              Reproductor 1
-            </Button>
-            <Button 
-              onClick={() => this.handlePlayerChange("default")}
-              style={{ 
-                backgroundColor: currentPlayer === "default" ? "#3f51b5" : "#1a237e",
-                color: "white",
-                fontWeight: currentPlayer === "default" ? "bold" : "normal",
-                padding: "8px 16px",
-                width: "140px"
-              }}
-            >
-              Reproductor 2
-            </Button>
-          </ButtonGroup>
-        </div>
-        
         {/* Contenedor de reproductores */}
-        {currentPlayer === "alternative" ? (
+        {alternativeId && !isLoadingAltId ? (
           // Reproductor alternativo (iframe)
           <div className="plyr__component" style={{ position: "relative", width: "100%", height: 0, paddingBottom: "56.25%" }}>
-            {isLoadingAltId ? (
-              // Mostrar indicador de carga mientras obtenemos el ID alternativo
-              <div style={{
+            <iframe
+              src={`https://Smoothpre.com/embed/${alternativeId}`}
+              frameBorder="0"
+              marginWidth="0"
+              marginHeight="0"
+              scrolling="no"
+              allowFullScreen
+              onError={() => this.setState({ alternativeId: null })}
+              style={{
                 position: "absolute",
                 top: 0,
                 left: 0,
                 width: "100%",
                 height: "100%",
-                backgroundColor: "#000",
-                color: "#fff",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
                 borderRadius: "12px",
                 borderWidth: "5px",
                 borderColor: "black",
                 borderStyle: "solid",
-              }}>
-                <div style={{ textAlign: "center" }}>
-                  <CircularProgress size={40} style={{ marginBottom: "10px" }}/>
-                  <Typography variant="subtitle1">Cargando reproductor...</Typography>
-                </div>
-              </div>
-            ) : (
-              <iframe
-                src={`https://Smoothpre.com/embed/${this.state.alternativeId}`}
-                frameBorder="0"
-                marginWidth="0"
-                marginHeight="0"
-                scrolling="no"
-                allowFullScreen
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "12px",
-                  borderWidth: "5px",
-                  borderColor: "black",
-                  borderStyle: "solid",
-                }}
-              ></iframe>
-            )}
+              }}
+            ></iframe>
           </div>
         ) : (
           // Reproductor original
