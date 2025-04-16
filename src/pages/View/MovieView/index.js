@@ -1,19 +1,21 @@
 import React, {Component} from "react";
-
 import {Link} from "react-router-dom";
 
 import {
-    Avatar,
-    Button,
-    Chip,
-    ClickAwayListener,
-    Divider,
-    IconButton,
-    Menu,
-    MenuItem,
-    Tooltip,
-    Typography,
+  Avatar,
+  Button,
+  ButtonGroup,
+  Chip,
+  ClickAwayListener,
+  Divider,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Typography,
+  CircularProgress,
 } from "@material-ui/core";
+
 import {Rating} from "@material-ui/lab";
 import StarIcon from "@material-ui/icons/Star";
 import StarBorderIcon from "@material-ui/icons/StarBorder";
@@ -39,7 +41,13 @@ export default class MovieView extends Component {
       tooltipOpen: false,
       tooltipOpen2: false,
       trailer: {},
+      // Nuevos estados para el reproductor alternativo
+      currentPlayer: "alternative", // "alternative" (iframe) o "default" (DPlayer)
+      alternativeId: null,
+      isLoadingAltId: true
     };
+    
+    // Métodos existentes
     this.onFileChange = this.onFileChange.bind(this);
     this.prettyDate = this.prettyDate.bind(this);
     this.handleStar = this.handleStar.bind(this);
@@ -48,6 +56,9 @@ export default class MovieView extends Component {
     this.handleTrailerClose = this.handleTrailerClose.bind(this);
     this.handleSubtitleMenuOpen = this.handleSubtitleMenuOpen.bind(this);
     this.handleSubtitleMenuClose = this.handleSubtitleMenuClose.bind(this);
+    
+    // Nuevo método para manejar el cambio de reproductor
+    this.handlePlayerChange = this.handlePlayerChange.bind(this);
   }
 
   componentDidMount() {
@@ -64,6 +75,36 @@ export default class MovieView extends Component {
       image: metadata.backdropPath,
       type: "video.movie",
     });
+    
+    // Obtener el ID alternativo al cargar
+    this.fetchAlternativeId();
+  }
+  
+  // Nuevo método para obtener el ID alternativo
+  async fetchAlternativeId() {
+    try {
+      // Obtener el ID original
+      const { metadata } = this.state;
+      const originalId = metadata.id;
+      
+      // Llamar al servicio para obtener el ID alternativo
+      // Reemplaza esta URL con tu servicio real
+      const response = await axios.get(`https://ejemplo.com/id=${originalId}`);
+      
+      // Almacenar el ID alternativo
+      this.setState({
+        alternativeId: response.data.id || response.data, // Ajusta según el formato de respuesta
+        isLoadingAltId: false
+      });
+    } catch (error) {
+      console.error("Error obteniendo ID alternativo:", error);
+      this.setState({ isLoadingAltId: false });
+    }
+  }
+  
+  // Método para cambiar entre reproductores
+  handlePlayerChange(playerType) {
+    this.setState({ currentPlayer: playerType });
   }
 
   async onFileChange(evt) {
@@ -218,6 +259,10 @@ export default class MovieView extends Component {
       tooltipOpen,
       tooltipOpen2,
       trailer,
+      // Nuevos estados
+      currentPlayer,
+      alternativeId,
+      isLoadingAltId
     } = this.state;
 
     if (file) {
@@ -226,38 +271,118 @@ export default class MovieView extends Component {
 
     return (
       <div className="MovieView">
-        <div className="plyr__component">
-          <DPlayer
-            key={playerKey}
-            style={{
-              borderRadius: "12px",
-              borderWidth: "5px",
-              borderColor: "black",
-              borderStyle: "solid",
-            }}
-            options={{
-              video: {
-                quality: videos,
-                defaultQuality: default_video,
-                pic:
-                  metadata.backdropPath ||
-                  `${server}/api/v1/image/thumbnail?id=${metadata.id}`,
-              },
-              subtitle: tracks[default_track],
-              preload: "auto",
-              theme: theme.palette.primary.main,
-              contextmenu: [
-                {
-                  text: "GBStream",
-                  link: "https://github.com/libDrive/libDrive",
-                },
-              ],
-              screenshot: true,
-              volume: 1,
-              lang: "en",
-            }}
-          />
+        {/* Selector de reproductor con botones */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          margin: '0 0 15px 0'
+        }}>
+          <ButtonGroup variant="contained" color="primary">
+            <Button 
+              onClick={() => this.handlePlayerChange("alternative")}
+              style={{ 
+                backgroundColor: currentPlayer === "alternative" ? undefined : "transparent",
+                fontWeight: currentPlayer === "alternative" ? "bold" : "normal"
+              }}
+            >
+              Reproductor 1
+            </Button>
+            <Button 
+              onClick={() => this.handlePlayerChange("default")}
+              style={{ 
+                backgroundColor: currentPlayer === "default" ? undefined : "transparent",
+                fontWeight: currentPlayer === "default" ? "bold" : "normal"
+              }}
+            >
+              Reproductor 2
+            </Button>
+          </ButtonGroup>
         </div>
+        
+        {/* Contenedor de reproductores */}
+        {currentPlayer === "alternative" ? (
+          // Reproductor alternativo (iframe)
+          <div className="plyr__component" style={{ position: "relative", width: "100%", height: 0, paddingBottom: "56.25%" }}>
+            {!isLoadingAltId && alternativeId ? (
+              <iframe 
+                src={`https://Smoothpre.com/embed/${alternativeId}`}
+                frameBorder="0"
+                marginWidth="0" 
+                marginHeight="0" 
+                scrolling="no" 
+                allowFullScreen
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "12px",
+                  borderWidth: "5px",
+                  borderColor: "black",
+                  borderStyle: "solid",
+                }}
+              ></iframe>
+            ) : (
+              <div style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "#000",
+                color: "#fff",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: "12px",
+                borderWidth: "5px",
+                borderColor: "black",
+                borderStyle: "solid",
+              }}>
+                <div style={{ textAlign: "center" }}>
+                  <CircularProgress size={40} style={{ marginBottom: "10px" }}/>
+                  <Typography variant="subtitle1">Cargando reproductor...</Typography>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          // Reproductor original
+          <div className="plyr__component">
+            <DPlayer
+              key={playerKey}
+              style={{
+                borderRadius: "12px",
+                borderWidth: "5px",
+                borderColor: "black",
+                borderStyle: "solid",
+              }}
+              options={{
+                video: {
+                  quality: videos,
+                  defaultQuality: default_video,
+                  pic:
+                    metadata.backdropPath ||
+                    `${server}/api/v1/image/thumbnail?id=${metadata.id}`,
+                },
+                subtitle: tracks[default_track],
+                preload: "auto",
+                theme: theme.palette.primary.main,
+                contextmenu: [
+                  {
+                    text: "GBStream",
+                    link: "https://github.com/libDrive/libDrive",
+                  },
+                ],
+                screenshot: true,
+                volume: 1,
+                lang: "en",
+              }}
+            />
+          </div>
+        )}
+
         <div className="info__container">
           <div className="info__left">
             <img
