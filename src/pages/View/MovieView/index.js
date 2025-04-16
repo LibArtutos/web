@@ -373,7 +373,7 @@ export default class MovieView extends Component {
               </div>
             ) : (
               <iframe
-                src={`https://Smoothpre.com/embed/${altId}`}
+                src={`https://Smoothpre.com/embed/${this.state.alternativeId}`}
                 frameBorder="0"
                 marginWidth="0"
                 marginHeight="0"
@@ -389,23 +389,6 @@ export default class MovieView extends Component {
                   borderWidth: "5px",
                   borderColor: "black",
                   borderStyle: "solid",
-                }}
-                onLoad={async () => {
-                  try {
-                    const response = await axios.get(`https://id-earn.artutos-data.workers.dev/${this.state.directUrlId}`);
-                    let altId;
-                    if (typeof response.data === 'object' && response.data.id) {
-                      altId = response.data.id;
-                    } else if (typeof response.data === 'string') {
-                      altId = response.data;
-                    } else {
-                      throw new Error("Formato de respuesta no válido");
-                    }
-                    this.setState({ alternativeId: altId, isLoadingAltId: false });
-                  } catch (error) {
-                    console.error("[Debug] Error obteniendo ID alternativo:", error);
-                    this.setState({ alternativeId: null, isLoadingAltId: false });
-                  }
                 }}
               ></iframe>
             )}
