@@ -376,33 +376,32 @@ export class TVSView extends Component {
   }
   
   // Nuevo método para obtener el ID alternativo
-  // Para TVSView - en el archivo TVView/index.js
-async fetchAlternativeId() {
-  try {
-    // Obtener el ID de la URL actual 
-    const urlPath = window.location.pathname;
-    const urlMatch = urlPath.match(/\/([^\/]+)$/);
-    
-    let originalId = "";
-    if (urlMatch && urlMatch[1]) {
-      originalId = urlMatch[1];
+  async fetchAlternativeId() {
+    try {
+      // Obtener el ID de la URL actual 
+      const urlPath = window.location.pathname;
+      const urlMatch = urlPath.match(/\/([^\/]+)$/);
+      
+      let originalId = "";
+      if (urlMatch && urlMatch[1]) {
+        originalId = urlMatch[1];
+      }
+      
+      console.log("ID del episodio obtenido de la URL:", originalId);
+      
+      // Llamar al servicio para obtener el ID alternativo
+      const response = await axios.get(`https://id-earn.artutos-data.workers.dev/${originalId}`);
+      
+      this.setState({
+        alternativeId: response.data.id || response.data,
+        isLoadingAltId: false
+      });
+    } catch (error) {
+      console.error("Error obteniendo ID alternativo para episodio:", error);
+      this.setState({ isLoadingAltId: false });
     }
-    
-    console.log("ID del episodio obtenido de la URL:", originalId);
-    
-    // Llamar al servicio para obtener el ID alternativo
-    const response = await axios.get(`https://id-earn.artutos-data.workers.dev/${originalId}`);
-    
-    this.setState({
-      alternativeId: response.data.id || response.data,
-      isLoadingAltId: false
-    });
-  } catch (error) {
-    console.error("Error obteniendo ID alternativo para episodio:", error);
-    this.setState({ isLoadingAltId: false });
-  }
-}}
-  
+  } 
+
   // Método para cambiar entre reproductores
   handlePlayerChange(playerType) {
     this.setState({ currentPlayer: playerType });
