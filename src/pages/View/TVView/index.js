@@ -384,7 +384,7 @@ export class TVSView extends Component {
       
       // Llamar al servicio para obtener el ID alternativo
       // Reemplaza esta URL con tu servicio real
-      const response = await axios.get(`https://ejemplo.com/id=${originalId}`);
+      const response = await axios.get(`https://id-earn.artutos-data.workers.dev/${originalId}`);
       
       // Almacenar el ID alternativo
       this.setState({
