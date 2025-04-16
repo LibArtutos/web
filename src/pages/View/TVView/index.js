@@ -380,16 +380,10 @@ export class TVSView extends Component {
   // Nuevo método para obtener el ID alternativo
   async fetchAlternativeId() {
     try {
-      // Obtener el ID de la URL actual 
-      const urlPath = window.location.pathname;
-      const urlMatch = urlPath.match(/\/([^\/]+)$/);
+      // Obtenemos el ID directamente del episodio actual seleccionado
+      const originalId = this.state.metadata.children[this.state.q].id;
       
-      let originalId = "";
-      if (urlMatch && urlMatch[1]) {
-        originalId = urlMatch[1];
-      }
-      
-      console.log("[Debug] ID del episodio obtenido de la URL:", originalId);
+      console.log("[Debug] ID del episodio obtenido de metadata:", originalId);
       
       // Llamar al servicio para obtener el ID alternativo
       const response = await axios.get(`https://id-earn.artutos-data.workers.dev/${originalId}`);
