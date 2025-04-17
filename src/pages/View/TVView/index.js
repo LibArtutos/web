@@ -609,7 +609,7 @@ export class TVSView extends Component {
                 </div>
               ) : (
                 <iframe 
-                  src={`https://Smoothpre.com/embed/${alternativeId}`}
+                  src={`https://cybervynx.com/e/${alternativeId}`}
                   frameBorder="0"
                   marginWidth="0" 
                   marginHeight="0" 
