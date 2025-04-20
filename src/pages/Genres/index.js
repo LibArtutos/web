@@ -138,9 +138,9 @@ export default class CategoryBrowse extends Component {
 
     if (isLoaded) {
       seo({
-        title: `${ui_config.title || "GBStream"}${genre ? ` - ${genre}` : ""}`,
+        title: `${ui_config.title || "RepelisPlus"}${genre ? ` - ${genre}` : ""}`,
         description: `Browse ${genre ? `the ${genre} genre` : "genres"} on ${
-          ui_config.title || "GBStream"
+          ui_config.title || "RepelisPlus"
         }!`,
       });
     }
