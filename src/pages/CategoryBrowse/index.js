@@ -164,11 +164,11 @@ export default class CategoryBrowse extends Component {
 
     if (isLoaded) {
       seo({
-        title: `${ui_config.title || "GBStream"} - ${
+        title: `${ui_config.title || "RepelisPlus"} - ${
           metadata[0].categoryInfo.name
         }`,
         description: `Browse ${metadata[0].categoryInfo.name} on ${
-          ui_config.title || "GBStream"
+          ui_config.title || "RepelisPlus"
         }!`,
       });
     }
