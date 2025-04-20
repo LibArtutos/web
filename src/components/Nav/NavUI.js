@@ -112,7 +112,7 @@ class NavUI extends Component {
                 </Avatar>
               ) : (
                 <Typography className={classes.title} variant="h6" noWrap>
-                  {ui_config.title || "GBStream"}
+                  {ui_config.title || "RepelisPlus"}
                 </Typography>
               )}
             </Link>
