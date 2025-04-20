@@ -80,11 +80,11 @@ export default class MovieView extends Component {
     let year = new Date().getFullYear();
 
     seo({
-      title: `${ui_config.title || "GBStream"} - ${
+      title: `${ui_config.title || "RepelisPlus"} - ${
           metadata.title || metadata.name
       } (${year}) - Español Latino Gratis`,
       description: `Watch ${metadata.title || metadata.name} on ${
-          ui_config.title || "GBStream"
+          ui_config.title || "RepelisPlus"
       }! — ${metadata.overview}`,
       image: metadata.backdropPath,
       type: "video.movie",
@@ -387,7 +387,7 @@ export default class MovieView extends Component {
               </div>
             ) : (
               <iframe
-                src={`https://gbstream.upns.pro/#${this.state.alternativeId}`}
+                src={`https://RepelisPlus.upns.pro/#${this.state.alternativeId}`}
                 frameBorder="0"
                 marginWidth="0"
                 marginHeight="0"
@@ -431,7 +431,7 @@ export default class MovieView extends Component {
                 theme: theme.palette.primary.main,
                 contextmenu: [
                   {
-                    text: "GBStream",
+                    text: "RepelisPlus",
                     link: "https://github.com/libDrive/libDrive",
                   },
                 ],
