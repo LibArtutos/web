@@ -332,10 +332,10 @@ export default class View extends Component {
     if (isLoaded) {
       seo({
         title: metadata.title
-          ? `${ui_config.title || "GBStream"} - ${metadata.title}`
-          : ui_config.title || "GBStream",
+          ? `${ui_config.title || "RepelisPlus"} - ${metadata.title}`
+          : ui_config.title || "RepelisPlus",
         description: `Watch ${metadata.title || metadata.name} on ${
-          ui_config.title || "GBStream"
+          ui_config.title || "RepelisPlus"
         }!`,
         image: metadata.backdropPath,
       });
