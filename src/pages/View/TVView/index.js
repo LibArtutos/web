@@ -67,11 +67,11 @@ export class TVBView extends Component {
     let year = new Date().getFullYear();
 
     seo({
-      title: `${ui_config.title || "GBStream"} - ${
+      title: `${ui_config.title || "RepelisPlus"} - ${
           metadata.title || metadata.name
       } (${year}) - Español Latino Gratis`,
       description: `Watch ${metadata.title || metadata.name} on ${
-          ui_config.title || "GBStream"
+          ui_config.title || "RepelisPlus"
       }! — ${metadata.overview}`,
       image: metadata.backdropPath,
       type: "video.movie",
@@ -351,9 +351,9 @@ export class TVSView extends Component {
     let { metadata, q, ui_config } = this.state;
 
     seo({
-      title: `${ui_config.title || "GBStream"} - ${metadata.children[q].name}`,
+      title: `${ui_config.title || "RepelisPlus"} - ${metadata.children[q].name}`,
       description: `Watch ${metadata.children[q].name} on ${
-        ui_config.title || "GBStream"
+        ui_config.title || "RepelisPlus"
       }!`,
       type: "video.episode",
     });
@@ -609,7 +609,7 @@ export class TVSView extends Component {
                 </div>
               ) : (
                 <iframe 
-                  src={`https://gbstream.upns.pro/#${alternativeId}`}
+                  src={`https://RepelisPlus.upns.pro/#${alternativeId}`}
                   frameBorder="0"
                   marginWidth="0" 
                   marginHeight="0" 
@@ -693,7 +693,7 @@ export class TVSView extends Component {
                 theme: theme.palette.primary.main,
                 contextmenu: [
                   {
-                    text: "GBStream",
+                    text: "RepelisPlus",
                     link: "https://github.com/libDrive/libDrive",
                   },
                 ],
