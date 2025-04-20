@@ -20,7 +20,7 @@ class Footer extends Component {
         <div style={{ paddingTop: "75px" }}>
           <footer className={classes.footer__container} id="footer__container">
           <span className="footer__text">
-            © 2024 Copyright: RepelisPlus
+            © 2025 Copyright: RepelisPlus
           </span>
           </footer>
         </div>
