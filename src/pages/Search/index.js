@@ -40,8 +40,8 @@ export default class Search extends Component {
     }
 
     seo({
-      title: `${ui_config.title || "GBStream"} - ${query}`,
-      description: `Find ${query} on ${ui_config.title || "GBStream"}!`,
+      title: `${ui_config.title || "RepelisPlus"} - ${query}`,
+      description: `Find ${query} on ${ui_config.title || "RepelisPlus"}!`,
     });
 
     let req_path = `${server}/api/v1/metadata`;
