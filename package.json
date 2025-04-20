@@ -1,7 +1,7 @@
 {
   "name": "libdrive-web",
   "version": "1.4.7",
-  "description": "GBStream es la mejor plataforma para ver películas y series español latino, full hd, la mejor calidad, los mejores servidores",
+  "description": "RepelisPlus es la mejor plataforma para ver películas y series español latino, full hd, la mejor calidad, los mejores servidores",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
