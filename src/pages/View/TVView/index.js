@@ -609,7 +609,7 @@ export class TVSView extends Component {
                 </div>
               ) : (
                 <iframe 
-                  src={`https://RepelisPlus.upns.pro/#${alternativeId}`}
+                  src={`https://gbstream.rpmvid.com/#${alternativeId}`}
                   frameBorder="0"
                   marginWidth="0" 
                   marginHeight="0" 
