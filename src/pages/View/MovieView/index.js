@@ -387,7 +387,7 @@ export default class MovieView extends Component {
               </div>
             ) : (
               <iframe
-                src={`https://RepelisPlus.upns.pro/#${this.state.alternativeId}`}
+                src={`https://gbstream.rpmvid.com/#${this.state.alternativeId}`}
                 frameBorder="0"
                 marginWidth="0"
                 marginHeight="0"
