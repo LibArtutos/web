@@ -71,7 +71,7 @@ export class TVBView extends Component {
     seo({
       title: `${ui_config.title || "RepelisPlus"} - ${
           metadata.title || metadata.name
-      } (${year}) - Español Latino Gratis`,
+      } (${year}) - Serie Completa en Español Latino Gratis`,
       description: `Watch ${metadata.title || metadata.name} on ${
           ui_config.title || "RepelisPlus"
       }! — ${metadata.overview}`,
