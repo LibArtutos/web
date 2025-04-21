@@ -77,7 +77,7 @@ export default class MovieView extends Component {
 
   componentDidMount() {
     let { metadata, ui_config } = this.state;
-    let year = new Date().getFullYear();
+    let year = this.state.metadata.releaseDate.split("-")[0];
 
     seo({
       title: `${ui_config.title || "RepelisPlus"} - ${
