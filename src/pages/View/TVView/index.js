@@ -64,7 +64,9 @@ export class TVBView extends Component {
 
   componentDidMount() {
     let { metadata, ui_config } = this.state;
-    let year = this.state.metadata.releaseDate.split("-")[0];
+    let year = metadata.releaseDate
+      ? new Date(metadata.releaseDate).getFullYear()
+      : new Date().getFullYear();
 
     seo({
       title: `${ui_config.title || "RepelisPlus"} - ${
